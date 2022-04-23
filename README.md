@@ -1,3 +1,3 @@
 # web-rad-server
 
-s
+[see this for more info](https://github.com/vegarringdal/web-rad)
