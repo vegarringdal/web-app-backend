@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "rootDirs": ["./src"],
         "target": "es2017",
         "module": "commonjs",
         "moduleResolution": "node",
@@ -8,7 +7,7 @@
         "esModuleInterop": true,
         "baseUrl": ".",
         "paths": {
-            "@rad-common": ["../rad-common/src/index.ts"],
+            "@rad-common": ["../rad-common/src/index.ts"]
         }
     },
     "exclude": ["node_modules", "dist"]
