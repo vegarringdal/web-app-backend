@@ -53,8 +53,9 @@ var DEFAULT_DB_CONNECTION_CLIENT_INFO = "WWW.SAMPLE.COM";
 var DEFAULT_DB_CONNECTION_MODULE = "WWW.SAMPLE.COM";
 var DEFAULT_DB_CONNECTION_DB_OP = "WEB-REPORTS";
 var DEFAULT_DB_CONNECTION_ACTION = "NA - NOT IN USE -> SENDING REPORT NAME";
-var DEFAULT_ACCESS_DB = "DEFAULT";
-var DEFAULT_ACCESS_VIEW = "WEB_ACCESS_VIEW";
+var DEFAULT_DB_USERNAME = "TESTDB";
+var DEFAULT_DB_PASSWORD = "TESTDB";
+var DEFAULT_DB_CONNECTION_STRING = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1522))(CONNECT_DATA=(SERVICE_NAME=xe)))";
 var DEFAULT_REDIS_URL = "redis://localhost:6379";
 var DEFAULT_AZURE_CLIENT_ID = "UNKNOW ID";
 var DEFAULT_AZURE_TENDANT_URI = "WWW.SAMPLE.COM";
@@ -62,10 +63,6 @@ var DEFAULT_AZURE_SECRET = "SUPER SECRET";
 var DEFAULT_AZURE_SCOPES = ["READ_ONLY"];
 var DEFAULT_ACTIVATE_AZURE_FAKE_SUCCESS = false;
 var DEFAULT_AZURE_FAKE_ROLES = [];
-var DEFAULT_DB_CONNECTIONS_NAMES_ARRAY = ["DEFAULT"];
-var DEFAULT_DB_USERNAME_ARRAY = ["DEFAULT_DB_USERNAME"];
-var DEFAULT_DB_CONNECTION_STRING_ARRAY = ["DEFAULT_DB_CONNECTION_STRING"];
-var DEFAULT_DB_PASSWORD_ARRAY = ["DEFAULT_DB_PASSWORD"];
 function toNumber(x, defaultValue) {
   const number = parseInt(x);
   if (isNaN(number)) {
@@ -143,8 +140,6 @@ var SESSION_NAME = toString(ENV.SESSION_NAME, DEFAULT_SESSION_NAME);
 var SESSION_HTTP_ONLY = toBool(ENV.SESSION_HTTP_ONLY, DEFAULT_SESSION_HTTP_ONLY);
 var SESSION_SAME_SITE = toBool(ENV.SESSION_SAME_SITE, DEFAULT_SESSION_SAME_SITE);
 var SESSION_SECURE = toBool(ENV.SESSION_SECURE, !IS_DEVELOPMENT);
-var ACCESS_DB = toString(ENV.ACCESS_DB, DEFAULT_ACCESS_DB);
-var ACCESS_VIEW = toString(ENV.ACCESS_VIEW, DEFAULT_ACCESS_VIEW);
 var REDIS_URL = toString(ENV.REDIS_URL, DEFAULT_REDIS_URL);
 var AZURE_CLIENT_ID = toString(ENV.AZURE_CLIENT_ID, DEFAULT_AZURE_CLIENT_ID);
 var AZURE_TENDANT_URI = toString(ENV.AZURE_TENDANT_URI, DEFAULT_AZURE_TENDANT_URI);
@@ -162,10 +157,9 @@ var DB_POOL_MAX = toNumber(ENV.DB_POOL_MAX, DEFAULT_DB_POOL_MAX);
 var DB_POOL_MIN = toNumber(ENV.DB_POOL_MIN, DEFAULT_DB_POOL_MIN);
 var DB_POOL_PING_INTERVAL = toNumber(ENV.DB_POOL_PING_INTERVAL, DEFAULT_DB_POOL_PING_INTERVAL);
 var DB_POOL_TIMEOUT = toNumber(ENV.DB_POOL_TIMEOUT, DEFAULT_DB_POOL_TIMEOUT);
-var DB_CONNECTIONS_NAMES_ARRAY = toArray(ENV.DB_CONNECTIONS_NAMES_ARRAY, DEFAULT_DB_CONNECTIONS_NAMES_ARRAY);
-var DB_USERNAME_ARRAY = toArray(ENV.DB_USERNAME_ARRAY, DEFAULT_DB_USERNAME_ARRAY);
-var DB_CONNECTION_STRING_ARRAY = toArray(ENV.DB_CONNECTION_STRING_ARRAY, DEFAULT_DB_CONNECTION_STRING_ARRAY);
-var DB_PASSWORD_ARRAY = toArray(ENV.DB_PASSWORD_ARRAY, DEFAULT_DB_PASSWORD_ARRAY);
+var DB_USERNAME = toString(ENV.DB_USERNAME_ARRAY, DEFAULT_DB_USERNAME);
+var DB_CONNECTION_STRING = toString(ENV.DB_CONNECTION_STRING, DEFAULT_DB_CONNECTION_STRING);
+var DB_PASSWORD = toString(ENV.DB_PASSWORD, DEFAULT_DB_PASSWORD);
 var DB_CONNECTION_CLIENT_ID = toString(ENV.DB_CONNECTION_CLIENT_ID, DEFAULT_DB_CONNECTION_CLIENT_ID);
 var DB_CONNECTION_CLIENT_INFO = toString(ENV.DB_CONNECTION_CLIENT_INFO, DEFAULT_DB_CONNECTION_CLIENT_INFO);
 var DB_CONNECTION_MODULE = toString(ENV.DB_CONNECTION_MODULE, DEFAULT_DB_CONNECTION_MODULE);
@@ -346,93 +340,32 @@ function startHttpServer() {
 
 // src/utils/initOracleDatabaseConnection.ts
 var import_oracledb = __toESM(require("oracledb"));
-
-// src/utils/verifyDatabaseEnviornmentVariables.ts
-function verifyDatabaseEnvironmentVariables() {
-  const ShouldBeLength = DB_CONNECTIONS_NAMES_ARRAY.length;
-  let failedTesting = false;
-  const ENV2 = process.env;
-  if (!ENV2.DEFAULT_VIEW_DB_NAME) {
-    failedTesting = true;
-    logError("ERROR:", "VITE_DEFAULT_DB_NAME missing");
-  }
-  if (!ENV2.DEFAULT_VIEW_DB_SCHEMA) {
-    failedTesting = true;
-    logError("ERROR:", "DEFAULT_VIEW_DB_SCHEMA missing");
-  }
-  if (!ENV2.DEFAULT_VIEW_DB_OBJECT) {
-    failedTesting = true;
-    logError("ERROR:", "DEFAULT_VIEW_DB_OBJECT missing");
-  }
-  if (ShouldBeLength !== DB_USERNAME_ARRAY.length) {
-    failedTesting = true;
-    logError("ERROR:", "DB_CONNECTIONS_NAMES_ARRAY and DB_USERNAME_ARRAY length not the same");
-  }
-  if (ShouldBeLength !== DB_CONNECTION_STRING_ARRAY.length) {
-    failedTesting = true;
-    logError("ERROR:", "DB_CONNECTIONS_NAMES_ARRAY and DB_CONNECTION_STRING_ARRAY length not the same");
-  }
-  if (ShouldBeLength !== DB_PASSWORD_ARRAY.length) {
-    failedTesting = true;
-    logError("ERROR:", "DB_CONNECTIONS_NAMES_ARRAY and DB_PASSWORD_ARRAY length not the same");
-  }
-  for (let i = 0; i < DB_CONNECTIONS_NAMES_ARRAY.length; i++) {
-    const dbName = DB_CONNECTIONS_NAMES_ARRAY[i];
-    if (!process.env[DB_USERNAME_ARRAY[i]]) {
-      failedTesting = true;
-      logError("ERROR:", DB_USERNAME_ARRAY[i], "is missing value", dbName);
-    }
-    if (!process.env[DB_PASSWORD_ARRAY[i]]) {
-      failedTesting = true;
-      logError("ERROR:", DB_PASSWORD_ARRAY[i], "is missing value", dbName);
-    }
-    if (!process.env[DB_CONNECTION_STRING_ARRAY[i]]) {
-      failedTesting = true;
-      logError("ERROR:", DB_CONNECTION_STRING_ARRAY[i], "is missing value", dbName);
-    }
-  }
-  if (failedTesting) {
-    logError("\n\nERROR: Database environment variables is missing data/have errors!\n");
-    process.exit(1);
-  }
-}
-
-// src/utils/initOracleDatabaseConnection.ts
 import_oracledb.default.outFormat = import_oracledb.default.OUT_FORMAT_ARRAY;
 import_oracledb.default.fetchArraySize = DB_FETCH_SIZE;
 import_oracledb.default.prefetchRows = DB_PREFETCH_SIZE;
 import_oracledb.default.fetchAsString = [import_oracledb.default.NUMBER];
 import_oracledb.default.extendedMetaData = true;
-var pool = {};
+var pool;
 async function initOracleDatabaseConnection() {
   logLine(true);
-  logStartup("ORACLEDB: Verifying environment variables");
-  verifyDatabaseEnvironmentVariables();
-  logStartup("ORACLEDB: Creating pools");
-  for (let i = 0; i < DB_CONNECTIONS_NAMES_ARRAY.length; i++) {
-    const dbName = DB_CONNECTIONS_NAMES_ARRAY[i];
-    logStartup(`ORACLEDB: Creating pool ${dbName}`);
-    logStartup("ORACLEDB: Username env/value:", DB_USERNAME_ARRAY[i], process.env[DB_USERNAME_ARRAY[i]]);
-    logStartup("ORACLEDB: Connection string env/value:", DB_CONNECTION_STRING_ARRAY[i], process.env[DB_CONNECTION_STRING_ARRAY[i]]);
-    try {
-      pool[dbName] = await import_oracledb.default.createPool({
-        user: process.env[DB_USERNAME_ARRAY[i]],
-        password: process.env[DB_PASSWORD_ARRAY[i]],
-        connectString: process.env[DB_CONNECTION_STRING_ARRAY[i]],
-        poolMax: DB_POOL_MAX,
-        poolMin: DB_POOL_MIN,
-        poolTimeout: DB_POOL_TIMEOUT,
-        poolPingInterval: DB_POOL_PING_INTERVAL
-      });
-      logStartup(`ORACLEDB: Created pool: ${dbName}`);
-    } catch (e) {
-      logError(`ORACLEDB: Error: ${dbName},`, e);
-      logError(`ORACLEDB: User:`, process.env[DB_USERNAME_ARRAY[i]]);
-      logError(`ORACLEDB: PassFirstLetter:`, process.env[DB_PASSWORD_ARRAY[i]][0]);
-      logError(`ORACLEDB: ConnectionString:`, process.env[DB_CONNECTION_STRING_ARRAY[i]]);
-    }
-    logLine(true);
+  logStartup("ORACLEDB: Creating connection pool");
+  try {
+    pool = await import_oracledb.default.createPool({
+      user: DB_USERNAME,
+      password: DB_PASSWORD,
+      connectString: DB_CONNECTION_STRING,
+      poolMax: DB_POOL_MAX,
+      poolMin: DB_POOL_MIN,
+      poolTimeout: DB_POOL_TIMEOUT,
+      poolPingInterval: DB_POOL_PING_INTERVAL
+    });
+    logStartup(`ORACLEDB: Connection pool created`);
+  } catch (e) {
+    logError(`ORACLEDB: User:`, DB_USERNAME);
+    logError(`ORACLEDB: PassFirstLetter:`, DB_PASSWORD[0]);
+    logError(`ORACLEDB: ConnectionString:`, DB_CONNECTION_STRING);
   }
+  logLine(true);
 }
 
 // src/index.ts
