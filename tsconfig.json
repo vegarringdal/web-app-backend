@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "rootDirs": ["./src"],
+        "target": "es2017",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "isolatedModules": false,
+        "esModuleInterop": true,
+        "baseUrl": ".",
+        "paths": {
+            "@application-common": ["../application-common/src/index.ts"],
+            "@application-api": ["../application-api/src/index.ts"]
+        }
+    },
+    "exclude": ["node_modules", "dist"]
+}
