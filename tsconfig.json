@@ -8,8 +8,7 @@
         "esModuleInterop": true,
         "baseUrl": ".",
         "paths": {
-            "@application-common": ["../application-common/src/index.ts"],
-            "@application-api": ["../application-api/src/index.ts"]
+            "@rad-common": ["../rad-common/src/index.ts"],
         }
     },
     "exclude": ["node_modules", "dist"]
