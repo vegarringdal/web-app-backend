@@ -1,5 +1,4 @@
-import { ApiInterface } from "@rad-common";
-import { UserRolesInterface } from "./userRolesInterface";
+import { ApiInterface, UserRolesInterface } from "@rad-common";
 
 export function generateRoleObject(config: ApiInterface, userRoles: string[]): UserRolesInterface {
     function isObject(x: any) {

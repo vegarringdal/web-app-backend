@@ -2,8 +2,7 @@ import { generateProjectCUDSql } from "./generateProjectCUDSql";
 import { BasicDataHandler } from "./basicDataHandler";
 import { log, logLine } from "@rad-common";
 import { CONSOLE_SELECT } from "../config";
-import { ApiInterface } from "@rad-common";
-import { UserRolesInterface } from "./userRolesInterface";
+import { ApiInterface, UserRolesInterface } from "@rad-common";
 
 /**
  * This takes care of standard update/new and delete
