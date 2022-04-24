@@ -4,7 +4,7 @@ import { getDatabaseConnection } from "./getDatabaseConnection";
 import { log, logError } from "@rad-common";
 import { STREAM_WRITE_TAG_END } from "./standardProjectQuery";
 import { CONSOLE_INFO } from "../config";
-import { ApiInterface } from "./apiInterface";
+import { ApiInterface } from "@rad-common";
 
 /**
  * Basic database handler to be used with standardProjectUpdate

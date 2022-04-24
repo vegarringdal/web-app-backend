@@ -1,4 +1,4 @@
-import { ApiInterface } from "../utils/apiInterface";
+import { ApiInterface } from "@rad-common";
 
 export const aiWebUserRoleApi: ApiInterface = {
     viewName: "AI_WEB_USER_ROLE",

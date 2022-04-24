@@ -7,7 +7,6 @@ import { readApiConfig } from "./utils/readApiConfig";
 import { getDefaultConfig } from "./utils/getDefaultConfig";
 
 async function start() {
-    // init database connection
     await initOracleDatabaseConnection();
 
     // todo check access layer works, lets just add a fetch here for now
@@ -26,14 +25,10 @@ async function start() {
     } catch (e) {
         logError("ORACLE ACCESS DB ERROR: default tables need to have be added");
         logError("ORACLE ACCESS DB ERROR:", e);
-        // exit
         process.exit(1);
     }
 
-    // init http server settings
     await initHttpConfig();
-
-    // time to start server
     startHttpServer();
 
     const { apis, errors } = readApiConfig(getDefaultConfig());

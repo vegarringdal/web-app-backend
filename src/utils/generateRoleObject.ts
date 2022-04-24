@@ -1,4 +1,4 @@
-import { ApiInterface } from "../utils/apiInterface";
+import { ApiInterface } from "@rad-common";
 import { UserRolesInterface } from "./userRolesInterface";
 
 export function generateRoleObject(config: ApiInterface, userRoles: string[]): UserRolesInterface {

@@ -8,7 +8,7 @@ import express from "express";
 import { standardProjectUpdate } from "./standardProjectUpdate";
 import { BasicDataHandler } from "./basicDataHandler";
 import { generateRoleObject } from "./generateRoleObject";
-import { ApiInterface } from "./apiInterface";
+import { ApiInterface } from "@rad-common";
 
 /**
  * when false we havent initiated the dynamic rest api

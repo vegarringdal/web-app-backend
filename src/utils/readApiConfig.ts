@@ -1,4 +1,4 @@
-import { ApiInterface } from "./apiInterface";
+import { ApiInterface } from "@rad-common";
 
 export function readApiConfig(aniConfig: ApiInterface[]) {
     const apis: ApiInterface[] = aniConfig;
