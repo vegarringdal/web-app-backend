@@ -152,7 +152,7 @@ function initiateDefaultConfig(app: express.Application) {
             res.status(200).send({
                 api: api,
                 apiRoles: userroles,
-                allUserRoles: sqlProjectRoles,
+                allUserRoles: userAzureRoles.concat(sqlProjectRoles),
                 user: { userName, userID }
             });
             res.end();
