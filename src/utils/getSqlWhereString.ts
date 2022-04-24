@@ -1,7 +1,7 @@
 // use data source filter, so we keep it up to date
 import type { FilterArgument } from "@simple-html/datasource";
 // quickfix, I prob should fix numbers on client side.. but Im lazy atm
-import { NumberFormater } from "./numberFormater";
+import { NumberFormater } from "@rad-common";
 
 /**
  *

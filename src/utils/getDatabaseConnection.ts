@@ -6,9 +6,9 @@ import {
 } from "../config";
 import { pool } from "./initOracleDatabaseConnection";
 
-export async function getDatabaseConnection(dbName: string, clientId: string) {
-    if (pool[dbName]) {
-        const connection = await pool[dbName].getConnection();
+export async function getDatabaseConnection(clientId: string) {
+    if (pool) {
+        const connection = await pool.getConnection();
 
         // we add these so DB admin can get info about connected application
         connection.clientId = clientId || DB_CONNECTION_CLIENT_ID;
@@ -19,6 +19,6 @@ export async function getDatabaseConnection(dbName: string, clientId: string) {
 
         return connection;
     } else {
-        throw `getDatabaseConnection, ${dbName}: pool not ready or unknown`;
+        throw `getDatabaseConnection, pool not ready or unknown`;
     }
 }

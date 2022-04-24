@@ -6,7 +6,6 @@ import { getDatabaseConnection } from "./getDatabaseConnection";
 /**
  * stream helper to get data out of oracle
  * when not using clean array or json first data is timestamp, next is metadata
- * @param poolName
  * @param sqlString select * from something etc
  * @param sqlBindings use [] if nothing
  * @param userID is sendt to oracle db as clientID for seesion data
@@ -17,10 +16,10 @@ import { getDatabaseConnection } from "./getDatabaseConnection";
  * @returns promise
  */
 export async function streamQuery(
-    poolName: string,
     sqlString: string,
     sqlBindings: any[],
     userID: string,
+    tableNameOrReportName: string,
     usejson: boolean | null,
     sendData: (data: string | any[], done: boolean) => void,
     cleanArray = false
@@ -33,21 +32,21 @@ export async function streamQuery(
         let error = false;
         const skipMeta = usejson || cleanArray;
         try {
-            log(CONSOLE_INFO, `Streaming from: ${poolName}: getConnection`);
-            connection = await getDatabaseConnection(poolName, userID);
-            log(CONSOLE_INFO, `Streaming from: ${poolName}: getConnection OK`);
+            log(CONSOLE_INFO, `Streaming, getConnection`);
+            connection = await getDatabaseConnection(userID);
+            log(CONSOLE_INFO, `Streaming, getConnection OK`);
         } catch (err) {
-            log(CONSOLE_INFO, `Streaming from: ${poolName}: getConnection FAILED:`, err);
+            log(CONSOLE_INFO, `Streaming, getConnection FAILED:`, err);
             reject({ success: false, msg: err });
             return;
         }
 
         try {
-            log(CONSOLE_INFO, `Streaming from: ${poolName}: queryStream`);
+            log(CONSOLE_INFO, `Streaming, calling queryStream`);
             stream = connection.queryStream(sqlString, sqlBindings, {
                 outFormat: usejson && !cleanArray ? OracleDB.OUT_FORMAT_OBJECT : OracleDB.OUT_FORMAT_ARRAY
             });
-            log(CONSOLE_INFO, `Streaming from: ${poolName}: queryStream ok`);
+            log(CONSOLE_INFO, `Streaming, queryStream ok`);
         } catch (err) {
             reject({ success: false, msg: err });
         }
@@ -62,12 +61,12 @@ export async function streamQuery(
         }
 
         stream?.on("close", function () {
-            log(CONSOLE_INFO, `Streaming from: ${poolName}: close event, buffer lenght:${buffer.length}`);
+            log(CONSOLE_INFO, `Streaming, close event, buffer lenght:${buffer.length}`);
             if (!error) {
                 if (cleanArray) {
-                    sendData(buffer, false);
+                    sendData(buffer, true);
                 } else {
-                    sendData(JSON.stringify(buffer), false);
+                    sendData(JSON.stringify(buffer), true);
                 }
             }
             buffer = [];
@@ -76,13 +75,13 @@ export async function streamQuery(
         });
 
         stream?.on("end", function () {
-            log(CONSOLE_INFO, `Streaming from: ${poolName}: end event`);
+            log(CONSOLE_INFO, `Streaming, end event`);
             stream.destroy();
         });
 
         stream?.on("error", function (err: any) {
             error = true;
-            log(CONSOLE_INFO, `Streaming from: ${poolName}: error event`, err);
+            log(CONSOLE_INFO, `Streaming, error event`, err);
             reject({ success: false, msg: err });
         });
 
@@ -100,7 +99,7 @@ export async function streamQuery(
         });
 
         stream?.on("metadata", function (metadata: any) {
-            log(CONSOLE_INFO, `Streaming from: ${poolName}: metadata event`);
+            log(CONSOLE_INFO, `Streaming, metadata event`);
             if (!skipMeta) {
                 buffer.push(metadata);
             }
