@@ -1,6 +1,7 @@
 import { ApiInterface } from "@rad-common";
 
 export const aiWebUserApi: ApiInterface = {
+    apiName: "WEB_USER",
     viewName: "AI_WEB_USER",
     accessUpdate: ["ACCESS_ADMIN"],
     accessInsert: ["ACCESS_ADMIN"],

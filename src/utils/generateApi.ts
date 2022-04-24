@@ -240,7 +240,7 @@ export function generateApi(app: express.Application, api: ApiInterface) {
     // add to api
     // this is why name also needs to be unique
     // I want to be able to update late, so maybe add version ?
-    API[api.viewName] = api;
+    API[api.apiName] = api;
 
     if (!initiatedDefaultApi) {
         initiateDefaultConfig(app);

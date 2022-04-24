@@ -43,7 +43,7 @@ async function start() {
 
     apis.forEach((api) => {
         generateApi(app, api);
-        logStartup("API added :", api.viewName);
+        logStartup("API added :", api.apiName);
     });
 
     // TODO: read out dynamic API
