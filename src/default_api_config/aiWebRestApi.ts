@@ -3,6 +3,8 @@ import { ApiInterface } from "../utils/apiInterface";
 export const aiWebRestApi: ApiInterface = {
     viewName: "AI_WEB_REST_API",
     accessUpdate: ["API_ADMIN"],
+    accessInsert: ["API_ADMIN"],
+    accessDelete: ["API_ADMIN"],
     primaryKey: "ID",
     primaryKeyType: "number",
     columns: [

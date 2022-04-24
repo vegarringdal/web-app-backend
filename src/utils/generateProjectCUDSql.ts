@@ -56,7 +56,8 @@ export function generateProjectCUDSql(
 
                 sqlString = `insert into ${viewName}(\n\t${keys.join(",\n\t")}) \nvalues(${keys
                     .map((v) => "\n\t:" + v)
-                    .join(",")})\nreturning \n\t${primaryKey} into :${"RETURN_KEY"}\n`;
+                    .join(",")})\n`;
+            // instead of update does not support returning, so need a workaround for it
         }
     }
 

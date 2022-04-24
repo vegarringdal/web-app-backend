@@ -144,9 +144,10 @@ function initiateDefaultConfig(app: express.Application) {
             const sessionUser = (req.session as any).user as sessionUserType;
             const userName = sessionUser?.name;
             const userID = sessionUser?.id;
+            const userAzureRoles = sessionUser?.roles;
             const sqlProjectRoles = await getRoles(userID);
 
-            const userroles = generateRoleObject(api, sqlProjectRoles);
+            const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles));
 
             res.status(200).send({
                 api: api,
@@ -206,9 +207,12 @@ function initiateDefaultConfig(app: express.Application) {
 
             const sessionUser = (req.session as any).user as sessionUserType;
             const userID = sessionUser?.id;
+            const userAzureRoles = sessionUser?.roles;
             const sqlProjectRoles = await getRoles(userID);
 
-            const userroles = generateRoleObject(api, sqlProjectRoles);
+            const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles));
+
+            // todo: not very userfriendly, todo, add format JSON...
             res.setHeader("Content-Type", "text/html"); // this should have been plain -> but I need ot figure out how ngninx override in our AKS
             res.setHeader("Cache-Control", "no-cache");
 

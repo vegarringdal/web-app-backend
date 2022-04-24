@@ -2,7 +2,6 @@ import { generateProjectCUDSql } from "./generateProjectCUDSql";
 import { BasicDataHandler } from "./basicDataHandler";
 import { log, logLine } from "@rad-common";
 import { CONSOLE_SELECT } from "../config";
-import { orableDB_Constants } from "./viewAccessInterface";
 import { ApiInterface } from "./apiInterface";
 import { UserRolesInterface } from "./userRolesInterface";
 
@@ -158,24 +157,7 @@ export async function standardProjectUpdate(
                     delete row.PRIMARY_KEY_VAR;
                 }
 
-                function getReturnType(tc: ApiInterface) {
-                    if (tc.primaryKeyType === "number") {
-                        return {
-                            type: orableDB_Constants.NUMBER,
-                            dir: orableDB_Constants.BIND_OUT
-                        };
-                    } else {
-                        return {
-                            type: orableDB_Constants.STRING,
-                            dir: orableDB_Constants.BIND_OUT
-                        };
-                    }
-                }
-
                 if (sqlString) {
-                    if (type === "insert") {
-                        row["RETURN_KEY"] = getReturnType(tableConfig);
-                    }
                     // todo: make own for updates
 
                     logLine(CONSOLE_SELECT);
