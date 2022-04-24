@@ -4,7 +4,7 @@ import { logError, logLine, logStartup } from "@rad-common";
 import { streamQuery } from "./utils/streamQuery";
 import { generateApi } from "./utils/generateApi";
 import { readApiConfig } from "./utils/readApiConfig";
-import { getDefaultConfig } from "@rad-common";
+import { getApiConfigs } from "@rad-common";
 
 async function start() {
     await initOracleDatabaseConnection();
@@ -31,7 +31,7 @@ async function start() {
     await initHttpConfig();
     startHttpServer();
 
-    const { apis, errors } = readApiConfig(getDefaultConfig());
+    const { apis, errors } = readApiConfig(getApiConfigs());
 
     if (errors.length) {
         errors.forEach((err) => {
