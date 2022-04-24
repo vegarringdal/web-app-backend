@@ -2,7 +2,6 @@ import OracleDB from "oracledb";
 import { Response } from "express";
 import { getDatabaseConnection } from "./getDatabaseConnection";
 import { log, logError } from "@rad-common";
-import { STREAM_WRITE_TAG_END } from "./standardProjectQuery";
 import { CONSOLE_INFO } from "../config";
 import { ApiInterface } from "@rad-common";
 
@@ -44,7 +43,7 @@ export class BasicDataHandler {
     public error(statusMessage: string, clientErrorMsg?: any) {
         logError(statusMessage, clientErrorMsg);
         this.res.statusMessage = statusMessage;
-        this.res.write(`${STREAM_WRITE_TAG_END}${JSON.stringify({ msg: clientErrorMsg || statusMessage || "" })}`);
+        this.res.write(`${JSON.stringify({ msg: clientErrorMsg || statusMessage || "" })}`);
         this.res.end();
     }
 
@@ -112,7 +111,7 @@ export class BasicDataHandler {
      * All ok, send success message back
      */
     public done() {
-        this.res.write(`${STREAM_WRITE_TAG_END}${JSON.stringify(this.newRecordKeys.flat())}`);
+        this.res.write(`${JSON.stringify(this.newRecordKeys.flat())}`);
         this.res.end();
     }
 }

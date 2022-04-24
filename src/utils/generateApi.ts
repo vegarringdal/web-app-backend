@@ -1,5 +1,5 @@
 import { log, logStartup } from "@rad-common";
-import { standardProjectQuery, STREAM_WRITE_ARRAY_SPLIT } from "./standardProjectQuery";
+import { standardProjectQuery } from "./standardProjectQuery";
 import { ACTIVATE_AZURE_FAKE_SUCCESS, CONSOLE_INFO } from "../config";
 import { MsalClient, sessionUserType } from "src/utils/msal";
 import { getRoles, updateSqlAccess } from "./getSqlAccess";
@@ -222,7 +222,7 @@ function initiateDefaultConfig(app: express.Application) {
                 api,
                 new BasicDataHandler(res, api, userID),
                 (count: number) => {
-                    res.write(`${STREAM_WRITE_ARRAY_SPLIT}${count}`);
+                    res.write(`${count}`);
                 }
             );
 
