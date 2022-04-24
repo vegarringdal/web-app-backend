@@ -1,4 +1,4 @@
-export interface ApiInterface {
+type ApiInterfaceBase = {
     /**
      * view in database to call
      */
@@ -8,20 +8,27 @@ export interface ApiInterface {
      * you will also be able to set permission on column
      * this is to simplify the process, save work
      */
-    accessUpdate: string[];
+    accessUpdate?: string[];
     /**
      * web roles needed to edit
      */
-    accessDelete: string[];
+    accessDelete?: string[];
     /**
      * web roles needed to edit
      */
-    accessInsert: string[];
+    accessInsert?: string[];
     /**
-     * FOR AUTO GENERATED PAGE ONLY
-     * for loading related children
-     * todo: do we want to load parent table/s too ?
+     * modified
+     * to get updated without getting all
      */
+    modified?: string;
+    /**
+     * columns we can edit
+     */
+    columns: ApiColumn[];
+};
+
+type ApiInterfaceChildView = {
     childView: string;
     /**
      * FOR AUTO GENERATED PAGE ONLY
@@ -33,33 +40,22 @@ export interface ApiInterface {
      * column to query with
      */
     childViewFrom: string;
-    /**
-     * modified
-     * to get updated without getting all
-     */
-    modified: string;
+};
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type ApiInterfaceModified = {
     /**
      * primary key, will use for selection during reload/delete/update
      * either 1 or many to generate key
      * important you dont use null columns here
      */
     primaryKey: string | string[];
-    /**
-     * columns we can edit
-     */
-    updatableColumn: ApiColumn[];
-}
+};
 
-/**
- *
- * note
- * it need to be none or one of these isCheckbox, dropDownView, dropDownValues, parentView
- * if isCheckbox, then we need checkboxChecked, checkboxUnchecked
- * if dropDownView, then we need dropDownValueColumn and dropDownLabelColumn
- * if dropDownValues, then we need atleast 2 sets [['blank', ''], ['yes', 'y']] so we can set blank
- * if parentView, then we need parentViewFrom, parentViewTo
- */
-export type ApiColumn = {
+type ApiInterfaceOptions = ApiInterfaceModified | ApiInterfaceChildView;
+export type ApiInterface = ApiInterfaceBase & ApiInterfaceOptions;
+
+type ApiColumnBase = {
     /**
      * name in view
      */
@@ -67,11 +63,15 @@ export type ApiColumn = {
     /**
      * what to use in grid/labels
      */
-    label: string;
-    /**
-     * is checkbox
-     */
+    label?: string;
+};
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type ApiColumnDropdownNoExtra = {
     update_access: string[];
+};
+
+type ApiColumnCheckbox = {
     /**
      * is checkbox
      */
@@ -84,6 +84,9 @@ export type ApiColumn = {
      * if checkbox, what value to set when unchecked
      */
     checkboxUnchecked: string;
+};
+
+type ApiColumnDropdownView = {
     /**
      * simple dropdown values
      * [[label, value],[label, value]]
@@ -91,11 +94,17 @@ export type ApiColumn = {
     dropDownView: string;
     dropDownValueColumn: string;
     dropDownLabelColumn: string;
+};
+
+type ApiColumnDropdownSimple = {
     /**
      * simple dropdown values
      * [[label, value],[label, value]]
      */
     dropDownValues: string[][];
+};
+
+type ApiColumnDropdownParentView = {
     /**
      * parent_view, will bring button on for opening dialog
      */
@@ -113,5 +122,13 @@ export type ApiColumn = {
      * [[fromParentColumn, toChildColumn],[fromParentColumn, toChildColumn]]
      * useful if you have many columns from parent, also depends on view
      */
-    parentViewColumnsFromTo: string[][];
+    parentViewColumnsFromTo?: string[][];
 };
+
+type ApiColumnOptions =
+    | ApiColumnDropdownNoExtra
+    | ApiColumnCheckbox
+    | ApiColumnDropdownView
+    | ApiColumnDropdownSimple
+    | ApiColumnDropdownParentView;
+export type ApiColumn = ApiColumnBase & ApiColumnOptions;
