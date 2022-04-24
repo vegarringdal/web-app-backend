@@ -92,12 +92,12 @@ export async function streamQuery(
                 buffer = [];
             }
         });
-        if (metaOnly) {
-            stream?.on("metadata", function (metadata: any) {
-                log(CONSOLE_INFO, `Streaming, metadata event`);
 
-                buffer = metadata;
-            });
-        }
+        stream?.on("metadata", function (metadata: any) {
+            log(CONSOLE_INFO, `Streaming, metadata event`);
+            if (!usejson) {
+                sendData(JSON.stringify([metadata]), false);
+            }
+        });
     });
 }
