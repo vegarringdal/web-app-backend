@@ -4,10 +4,6 @@ import { log, logLine } from "@rad-common";
 import { getSqlWhereString } from "../utils/getSqlWhereString";
 import { CONSOLE_INFO, CONSOLE_SELECT } from "../config";
 
-// we use this to test stream data on client side
-export const STREAM_WRITE_TAG_END = "!END!";
-export const STREAM_WRITE_ARRAY_SPLIT = "!CHSP!";
-
 export async function standardProjectQuery(
     req: any,
     res: Response<any, Record<string, any>>,
@@ -71,7 +67,7 @@ export async function standardProjectQuery(
         // not very beautiful, but a start
         switch (true) {
             case meta === "1":
-                sql = `select * ${sql} ${whereSql ? " and 1 = 0" : " where 1 = 0"}`;
+                sql = `select * ${sql} where 1 = 0`;
                 break;
             case count === "1":
                 sql = `select count(*) as count ${sql}`;
@@ -97,7 +93,7 @@ export async function standardProjectQuery(
     log(CONSOLE_SELECT, sql.split("\n").join("\n   Info:  "));
     logLine(CONSOLE_SELECT);
 
-    let firstJson = true;
+    let firstSend = true;
     // reuse report stream utillity class
     await streamQuery(
         sql,
@@ -107,13 +103,13 @@ export async function standardProjectQuery(
         usejson ? true : false,
         function (data: string, done: boolean) {
             if (usejson) {
-                if (firstJson && !done) {
+                if (firstSend && !done) {
                     data = data.substring(0, data.length - 1);
-                    firstJson = false;
+                    firstSend = false;
                 } else {
-                    if (firstJson && done) {
+                    if (firstSend && done) {
                         // do nothing, we need the entire string
-                        firstJson = false;
+                        firstSend = false;
                     } else {
                         if (!done) {
                             data = "," + data.substring(1, data.length - 1);
@@ -125,9 +121,25 @@ export async function standardProjectQuery(
 
                 res.write(data);
             } else {
-                res.write(data + STREAM_WRITE_TAG_END + STREAM_WRITE_ARRAY_SPLIT);
+                if (firstSend && !done) {
+                    data = data.substring(0, data.length - 1);
+                    firstSend = false;
+                } else {
+                    if (firstSend && done) {
+                        // do nothing, we need the entire string
+                        firstSend = false;
+                    } else {
+                        if (!done) {
+                            data = "," + data.substring(1, data.length - 1);
+                        } else {
+                            data = "," + data.substring(1, data.length);
+                        }
+                    }
+                }
+                res.write(data);
             }
-        }
+        },
+        meta ? true : false
     ).catch((e) => {
         res.statusMessage = e.msg?.message || e.msg;
         res.status(504).send();

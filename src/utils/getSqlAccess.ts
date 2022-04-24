@@ -36,8 +36,7 @@ export async function updateSqlAccess(username: string) {
                     }
                 });
             }
-        },
-        true
+        }
     );
     sqlUserRoles.set(username, roles);
 }

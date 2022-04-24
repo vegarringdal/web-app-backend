@@ -19,8 +19,7 @@ async function start() {
             true,
             (data) => {
                 logStartup("ORACLE ACCESS DB TEST: ", data);
-            },
-            true
+            }
         );
     } catch (e) {
         logError("ORACLE ACCESS DB ERROR: default tables need to have be added");

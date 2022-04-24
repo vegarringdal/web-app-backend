@@ -22,15 +22,14 @@ export async function streamQuery(
     tableNameOrReportName: string,
     usejson: boolean | null,
     sendData: (data: string | any[], done: boolean) => void,
-    cleanArray = false
+    metaOnly?: boolean
 ): Promise<{ success: boolean; msg?: any }> {
     return new Promise(async (resolve, reject) => {
         let connection: OracleDB.Connection;
         let stream: any;
-        let buffer: any[] = usejson || cleanArray ? [] : [new Date()]; // use date for smart refresh
+        let buffer: any[] = [];
         let closed = false;
         let error = false;
-        const skipMeta = usejson || cleanArray;
         try {
             log(CONSOLE_INFO, `Streaming, getConnection`);
             connection = await getDatabaseConnection(userID);
@@ -44,7 +43,7 @@ export async function streamQuery(
         try {
             log(CONSOLE_INFO, `Streaming, calling queryStream`);
             stream = connection.queryStream(sqlString, sqlBindings, {
-                outFormat: usejson && !cleanArray ? OracleDB.OUT_FORMAT_OBJECT : OracleDB.OUT_FORMAT_ARRAY
+                outFormat: usejson ? OracleDB.OUT_FORMAT_OBJECT : OracleDB.OUT_FORMAT_ARRAY
             });
             log(CONSOLE_INFO, `Streaming, queryStream ok`);
         } catch (err) {
@@ -63,11 +62,7 @@ export async function streamQuery(
         stream?.on("close", function () {
             log(CONSOLE_INFO, `Streaming, close event, buffer lenght:${buffer.length}`);
             if (!error) {
-                if (cleanArray) {
-                    sendData(buffer, true);
-                } else {
-                    sendData(JSON.stringify(buffer), true);
-                }
+                sendData(JSON.stringify(buffer), true);
             }
             buffer = [];
             closeConnection();
@@ -86,23 +81,23 @@ export async function streamQuery(
         });
 
         stream?.on("data", function (data: any) {
+            if (metaOnly) {
+                return;
+            }
             buffer.push(data);
 
             if (buffer.length > DB_FETCH_SIZE) {
-                if (cleanArray) {
-                    sendData(buffer, false);
-                } else {
-                    sendData(JSON.stringify(buffer), false);
-                }
+                sendData(JSON.stringify(buffer), false);
+
                 buffer = [];
             }
         });
+        if (metaOnly) {
+            stream?.on("metadata", function (metadata: any) {
+                log(CONSOLE_INFO, `Streaming, metadata event`);
 
-        stream?.on("metadata", function (metadata: any) {
-            log(CONSOLE_INFO, `Streaming, metadata event`);
-            if (!skipMeta) {
-                buffer.push(metadata);
-            }
-        });
+                buffer = metadata;
+            });
+        }
     });
 }

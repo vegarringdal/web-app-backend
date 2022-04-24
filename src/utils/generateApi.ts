@@ -180,7 +180,7 @@ function initiateDefaultConfig(app: express.Application) {
                 return;
             }
 
-            await standardProjectQuery(req, res, name);
+            await standardProjectQuery(req, res, api.viewName);
             next();
         });
     }
