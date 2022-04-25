@@ -52,6 +52,8 @@ export async function standardProjectQuery(
         if (!jsonFilter?.filterArguments && jsonFilter?.attribute) {
             jsonFilter = { filterArguments: [jsonFilter] };
         }
+        log(CONSOLE_SELECT, `QUERY INPUT:`);
+        log(CONSOLE_SELECT, JSON.stringify(jsonFilter));
         const result = getSqlWhereString(jsonFilter);
         whereSql = result.sqlString;
         sqlBindings = result.sqlBindings;
@@ -90,6 +92,8 @@ export async function standardProjectQuery(
     log(CONSOLE_SELECT, `--------------------------------------------------`);
     log(CONSOLE_SELECT, `standardProjectQuery:`);
     log(CONSOLE_SELECT, `--------------------------------------------------`);
+    log(CONSOLE_SELECT, `Bindings:`);
+    log(CONSOLE_SELECT, sqlBindings);
     log(CONSOLE_SELECT, sql.split("\n").join("\n   Info:  "));
     logLine(CONSOLE_SELECT);
 
