@@ -36,10 +36,15 @@ export function generateRoleObject(config: ApiInterface, userRoles: string[]): U
 
     if (Array.isArray(config.columns)) {
         config.columns.forEach((column) => {
-            const updateAccessConfig = config.accessUpdate || [];
-            const updateAccessCol = column.accessUpdate || [];
-            const updateAccessFull = updateAccessConfig.concat(updateAccessCol);
-
+            const updateAccessConfig = config.accessUpdate;
+            const updateAccessCol = column.accessUpdate;
+            let updateAccessFull = [];
+            // if set on column, this overrides default
+            if (Array.isArray(updateAccessCol)) {
+                updateAccessFull = updateAccessCol;
+            } else if (Array.isArray(updateAccessConfig)) {
+                updateAccessFull = updateAccessConfig;
+            }
             updateAccessFull.filter((role) => {
                 if (typeof role === "string") {
                     if (userRoles.includes(role)) {
