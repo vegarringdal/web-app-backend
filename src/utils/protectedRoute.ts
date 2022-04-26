@@ -5,12 +5,13 @@
 
 import { ACTIVATE_AZURE_FAKE_SUCCESS, AZURE_FAKE_ROLES, CONSOLE_INFO } from "../config";
 import { log } from "@rad-common";
-import { MsalClient } from "./msal";
 
 export async function protectedRoute(req: any, res: any, next: any) {
     //todo: remove
     // TODO: move...
     // JUST TO FAKE IT
+
+    console.log("auth", req.authentication);
 
     let error = false;
 
@@ -35,7 +36,7 @@ export async function protectedRoute(req: any, res: any, next: any) {
     } else {
         if (!ACTIVATE_AZURE_FAKE_SUCCESS) {
             try {
-                await ((res as any).__msalClient as MsalClient).acquireTokenSilent(req, false);
+                // todo, verify token
             } catch (x) {
                 res.status(401).send({
                     success: false,

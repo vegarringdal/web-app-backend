@@ -25,7 +25,6 @@ import {
     CONSOLE_INFO
 } from "./config";
 import { log, logError, logLine, logStartup } from "@rad-common";
-import { MsalClient } from "./utils/msal";
 
 /**
  * main application-server express application
@@ -43,31 +42,6 @@ export async function initHttpConfig() {
         app.use(helmet());
     }
 
-    /**
-     * use redis for session managment, so we can have many instances running
-     */
-    const RedisStore = StoreConnector.default(session);
-    logStartup("REDIS SERVER:", REDIS_URL);
-    const redisClient = redis.createClient({
-        legacyMode: true, // todo, need to check why better
-        url: REDIS_URL
-    });
-    const store = new RedisStore({ client: redisClient });
-    logStartup("REDIS SERVER: About to connect to redis");
-
-    //
-    try {
-        await redisClient.connect();
-    } catch (err) {
-        logError("REDIS SERVER: unable to connect to redis server on startup, is it started, is url correct ?");
-        logError("REDIS SERVER ERROR:\n", err);
-        process.exit(1);
-    }
-    logStartup("REDIS SERVER: connect done");
-
-    // now we register standard error handler, TODO: need better error handling than this,,,
-    redisClient.on("error", (err) => logError("Redis Client Error", err));
-
     // allow large updates
     app.use(express.json({ limit: "500mb" }));
 
@@ -77,7 +51,6 @@ export async function initHttpConfig() {
     app.set("trust proxy", 1); // trust first proxy ?
     app.use(
         session({
-            store: store,
             name: SESSION_NAME,
             secret: SESSION_PRIVATE_KEY,
             resave: false,
@@ -95,18 +68,6 @@ export async function initHttpConfig() {
     );
 
     /**
-     * Compression
-     */
-    if (SERVER_COMPRESSION) {
-        app.use(
-            compression({
-                threshold: 1,
-                flush: zlib.constants.Z_SYNC_FLUSH
-            })
-        );
-    }
-
-    /**
      * body parser
      * so we can receive json
      */
@@ -116,24 +77,6 @@ export async function initHttpConfig() {
      * static resources from application build
      */
     app.use("/", express.static(WEB_ROOT));
-
-    /**
-     * set cache plugin for each session
-     */
-    app.use(function (req, res, next) {
-        (res as any).__msalClient = new MsalClient(req);
-        next();
-    });
-
-    app.get("/login", (req, res) => {
-        log(CONSOLE_INFO, "Called /login");
-        ((res as any).__msalClient as MsalClient).login(res);
-    });
-
-    app.get("/redirect", async (req: any, res) => {
-        log(CONSOLE_INFO, "Called /redirect");
-        ((res as any).__msalClient as MsalClient).redirect(req, res);
-    });
 }
 
 export function startHttpServer() {

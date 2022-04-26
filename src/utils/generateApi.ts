@@ -1,7 +1,6 @@
 import { log, logStartup } from "@rad-common";
 import { standardProjectQuery } from "./standardProjectQuery";
 import { ACTIVATE_AZURE_FAKE_SUCCESS, CONSOLE_INFO } from "../config";
-import { MsalClient, sessionUserType } from "src/utils/msal";
 import { getRoles, updateSqlAccess } from "./getSqlAccess";
 import { protectedRoute } from "./protectedRoute";
 import express from "express";
@@ -9,6 +8,14 @@ import { standardProjectUpdate } from "./standardProjectUpdate";
 import { BasicDataHandler } from "./basicDataHandler";
 import { generateRoleObject } from "./generateRoleObject";
 import { ApiInterface } from "@rad-common";
+
+// SESSION INFO
+export type sessionUserType = {
+    name: string;
+    id: string;
+    roles: string[];
+    account: any;
+};
 
 /**
  * when false we havent initiated the dynamic rest api
@@ -61,7 +68,7 @@ function initiateDefaultConfig(app: express.Application) {
                 res.end();
             } else {
                 try {
-                    await ((res as any).__msalClient as MsalClient).acquireTokenSilent(req, true);
+                    // verify token
 
                     // get sql roles
                     const sessionUser = (req.session as any).user as sessionUserType;
