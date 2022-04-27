@@ -9,7 +9,7 @@ const cache: any = {};
 
 export async function verifyToken(token) {
     try {
-        debugger
+        debugger;
         const decodedToken = jwt.decode(token, { complete: true });
 
         async function getKeys() {
@@ -22,7 +22,7 @@ export async function verifyToken(token) {
 
                 const keys = await client.getSigningKey(decodedToken.header.kid);
                 cache.time = new Date();
-                cache.keys = keys.publicKey;
+                cache.keys = keys.getPublicKey();
                 return cache.keys;
             }
         }
@@ -37,7 +37,7 @@ export async function verifyToken(token) {
         if (!checkTimestamp) {
             throw "expired token";
         }
-        console.log(verifiedToken);
+
         return verifiedToken;
     } catch (err) {
         console.error(err);
