@@ -1,7 +1,7 @@
 import { log, logStartup } from "@rad-common";
 import { standardProjectQuery } from "./standardProjectQuery";
-import { ACTIVATE_AZURE_FAKE_SUCCESS, CONSOLE_INFO } from "../config";
-import { getRoles, updateSqlAccess } from "./getSqlAccess";
+import { CONSOLE_INFO } from "../config";
+import { getRoles } from "./getSqlAccess";
 import { protectedRoute } from "./protectedRoute";
 import express from "express";
 import { standardProjectUpdate } from "./standardProjectUpdate";
@@ -14,7 +14,6 @@ export type sessionUserType = {
     name: string;
     id: string;
     roles: string[];
-    account: any;
 };
 
 /**
@@ -52,46 +51,6 @@ function initiateDefaultConfig(app: express.Application) {
                 user: { userName, userID }
             });
             res.end();
-            next();
-        });
-    }
-
-    {
-        /**
-         * forceupdate session data from ms
-         */
-        const API_INFO = `/api/authUpdate`;
-        logStartup("API added:", API_INFO);
-        app.get(API_INFO, async function (req: any, res, next) {
-            if (ACTIVATE_AZURE_FAKE_SUCCESS) {
-                res.status(200);
-                res.end();
-            } else {
-                try {
-                    // verify token
-
-                    // get sql roles
-                    const sessionUser = (req.session as any).user as sessionUserType;
-                    const userID = sessionUser?.id;
-                    const userName = sessionUser?.name;
-                    const userAzureRoles = sessionUser?.roles;
-                    await updateSqlAccess(sessionUser?.id);
-                    const sqlProjectRoles = await getRoles(userID);
-
-                    res.status(200).send({
-                        azureRoles: userAzureRoles,
-                        allUserRoles: userAzureRoles.concat(sqlProjectRoles),
-                        user: { userName, userID }
-                    });
-                    res.end();
-                } catch (x) {
-                    res.status(401).send({
-                        success: false,
-                        message: "not logged in, could not refresh token",
-                        auth: false
-                    });
-                }
-            }
             next();
         });
     }

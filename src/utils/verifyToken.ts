@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
-import { AZURE_CLIENT_ID, AZURE_TENDANT_ID } from "src/config";
+import { AZURE_CLIENT_ID, AZURE_TENDANT_ID } from "../config";
 
 // important, you can not use graph scope, it will not be able to verifytoken if you do..
 const customScope = `api://${AZURE_CLIENT_ID}`;
@@ -9,6 +9,7 @@ const cache: any = {};
 
 export async function verifyToken(token) {
     try {
+        debugger
         const decodedToken = jwt.decode(token, { complete: true });
 
         async function getKeys() {
