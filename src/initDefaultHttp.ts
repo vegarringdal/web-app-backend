@@ -1,30 +1,8 @@
 import path from "path";
 import express from "express";
 import helmet from "helmet";
-import session from "express-session";
-import compression from "compression";
-import * as zlib from "zlib";
-import * as redis from "redis";
-import * as StoreConnector from "connect-redis";
-import {
-    WEB_ROOT,
-    SERVER_PORT,
-    SESSION_PRIVATE_KEY,
-    SESSION_NAME,
-    SESSION_DOMAIN,
-    SESSION_MAX_AGE,
-    IS_DEVELOPMENT,
-    PORT_WEB,
-    PORT_API,
-    SESSION_HTTP_ONLY,
-    SESSION_SAME_SITE,
-    SERVER_HOST,
-    SERVER_COMPRESSION,
-    SESSION_SECURE,
-    REDIS_URL,
-    CONSOLE_INFO
-} from "./config";
-import { log, logError, logLine, logStartup } from "@rad-common";
+import { WEB_ROOT, SERVER_PORT, IS_DEVELOPMENT, PORT_WEB, PORT_API, SERVER_HOST } from "./config";
+import { logLine, logStartup } from "@rad-common";
 
 /**
  * main application-server express application
@@ -49,23 +27,6 @@ export async function initHttpConfig() {
      * session
      */
     app.set("trust proxy", 1); // trust first proxy ?
-    app.use(
-        session({
-            name: SESSION_NAME,
-            secret: SESSION_PRIVATE_KEY,
-            resave: false,
-            saveUninitialized: true,
-            cookie: {
-                path: "/",
-                httpOnly: SESSION_HTTP_ONLY,
-                signed: true,
-                sameSite: SESSION_SAME_SITE,
-                maxAge: SESSION_MAX_AGE,
-                domain: SESSION_DOMAIN,
-                secure: SESSION_SECURE // only used for production/https
-            }
-        })
-    );
 
     /**
      * body parser

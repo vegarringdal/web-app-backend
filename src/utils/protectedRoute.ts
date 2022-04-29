@@ -14,7 +14,7 @@ export async function protectedRoute(req: any, res: any, next: any) {
     if (ACTIVATE_AZURE_FAKE_SUCCESS) {
         log(CONSOLE_INFO, "ACTIVATED FAKE USER", "ROLES GIVEN:", AZURE_FAKE_ROLES);
 
-        (req.session as any).user = {
+        req.user = {
             name: "FAKE USER",
             id: "FAKE USER ID",
             roles: AZURE_FAKE_ROLES
@@ -25,7 +25,7 @@ export async function protectedRoute(req: any, res: any, next: any) {
         try {
             const tokenVerified = await verifyToken(req.headers.authorization.split("Bearer ")[1]);
 
-            (req.session as any).user = {
+            req.user = {
                 name: tokenVerified.name,
                 id: tokenVerified.upn,
                 roles: tokenVerified.roles

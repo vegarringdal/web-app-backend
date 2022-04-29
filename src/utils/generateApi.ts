@@ -9,8 +9,7 @@ import { BasicDataHandler } from "./basicDataHandler";
 import { generateRoleObject } from "./generateRoleObject";
 import { ApiInterface } from "@rad-common";
 
-// SESSION INFO
-export type sessionUserType = {
+export type User = {
     name: string;
     id: string;
     roles: string[];
@@ -39,10 +38,10 @@ function initiateDefaultConfig(app: express.Application) {
         const API_INFO = `/api/auth`;
         logStartup("API added:", API_INFO);
         app.get(API_INFO, protectedRoute, async function (req: any, res, next) {
-            const sessionUser = (req.session as any).user as sessionUserType;
-            const userName = sessionUser?.name;
-            const userID = sessionUser?.id;
-            const userAzureRoles = sessionUser?.roles;
+            const user = req.user as User;
+            const userName = user?.name;
+            const userID = user?.id;
+            const userAzureRoles = user?.roles;
             const sqlProjectRoles = await getRoles(userID);
 
             res.status(200).send({
@@ -70,10 +69,10 @@ function initiateDefaultConfig(app: express.Application) {
                     path: key
                 };
             });
-            const sessionUser = (req.session as any).user as sessionUserType;
-            const userName = sessionUser?.name;
-            const userID = sessionUser?.id;
-            const userAzureRoles = sessionUser?.roles;
+            const user = req.user as User;
+            const userName = user?.name;
+            const userID = user?.id;
+            const userAzureRoles = user?.roles;
             const sqlProjectRoles = await getRoles(userID);
 
             res.status(200).send({
@@ -107,10 +106,10 @@ function initiateDefaultConfig(app: express.Application) {
                 return;
             }
 
-            const sessionUser = (req.session as any).user as sessionUserType;
-            const userName = sessionUser?.name;
-            const userID = sessionUser?.id;
-            const userAzureRoles = sessionUser?.roles;
+            const user = req.user as User;
+            const userName = user?.name;
+            const userID = user?.id;
+            const userAzureRoles = user?.roles;
             const sqlProjectRoles = await getRoles(userID);
 
             const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles));
@@ -157,7 +156,7 @@ function initiateDefaultConfig(app: express.Application) {
          */
         const API_UPDATE = `/api/update/*`;
         logStartup("API added:", API_UPDATE);
-        app.post(API_UPDATE, protectedRoute, express.json(), async function (req, res, next) {
+        app.post(API_UPDATE, protectedRoute, express.json(), async function (req: any, res, next) {
             log(CONSOLE_INFO, "calling api:", API_UPDATE);
 
             const name = req.path.replace(API_UPDATE.replace("*", ""), "");
@@ -171,9 +170,9 @@ function initiateDefaultConfig(app: express.Application) {
                 return;
             }
 
-            const sessionUser = (req.session as any).user as sessionUserType;
-            const userID = sessionUser?.id;
-            const userAzureRoles = sessionUser?.roles;
+            const user = req.user as User;
+            const userID = user?.id;
+            const userAzureRoles = user?.roles;
             const sqlProjectRoles = await getRoles(userID);
 
             const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles));
