@@ -10,13 +10,13 @@ import { ApiInterface, UserRolesInterface } from "@rad-common";
  * @param req
  * @param res
  * @param dbConnectionName
- * @param tableConfig if projectColumnName is null, then it asumes no project column is used
+ * @param apiConfig if projectColumnName is null, then it asumes no project column is used
  * @returns
  */
 export async function standardProjectUpdate(
     data: any,
     roles: UserRolesInterface,
-    tableConfig: ApiInterface,
+    apiConfig: ApiInterface,
     databaseHandler: BasicDataHandler,
     callback: (count: number) => void
 ) {
@@ -107,8 +107,7 @@ export async function standardProjectUpdate(
 
                 const [sqlString, type] = generateProjectCUDSql(
                     roles.UPDATABLE_COLUMNS || [], //  TODO: I need to filter out readonly columns before I run this..
-                    tableConfig.viewName,
-                    tableConfig.primaryKey,
+                    apiConfig,
                     row
                 );
 
@@ -156,8 +155,14 @@ export async function standardProjectUpdate(
                     delete row.PRIMARY_KEY_VAR;
                 }
 
+                // overide whatever is in project code, as long as there is project column configured.
+                if (apiConfig.project) {
+                    // if no project column is not defined as null
+                    cleanData[apiConfig.project] = roles.PROJECT_CODE;
+                }
+
                 if (sqlString) {
-                    // todo: make own for updates
+                    // here I should have used oracle bind, but inserts did not support it..
 
                     logLine(CONSOLE_SELECT);
                     log(CONSOLE_SELECT, "Update/insert/delete sql:");

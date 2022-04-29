@@ -106,13 +106,14 @@ function initiateDefaultConfig(app: express.Application) {
                 return;
             }
 
+            const project_code = req.query.project as string;
             const user = req.user as User;
             const userName = user?.name;
             const userID = user?.id;
             const userAzureRoles = user?.roles;
             const sqlProjectRoles = await getRoles(userID);
 
-            const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles));
+            const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles), project_code);
 
             res.status(200).send({
                 api: api,
@@ -145,7 +146,7 @@ function initiateDefaultConfig(app: express.Application) {
                 return;
             }
 
-            await standardProjectQuery(req, res, api.viewName);
+            await standardProjectQuery(req, res, api);
             next();
         });
     }
@@ -174,8 +175,9 @@ function initiateDefaultConfig(app: express.Application) {
             const userID = user?.id;
             const userAzureRoles = user?.roles;
             const sqlProjectRoles = await getRoles(userID);
+            const project_code = req.query.project as string;
 
-            const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles));
+            const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles), project_code);
 
             // todo: not very userfriendly, todo, add format JSON...
             res.setHeader("Content-Type", "text/html"); // this should have been plain -> but I need ot figure out how ngninx override in our AKS

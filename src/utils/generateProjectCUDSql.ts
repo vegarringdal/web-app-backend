@@ -1,17 +1,16 @@
+import { ApiInterface } from "../../../rad-common/src/utils/ApiInterface";
+
 enum sqlType {
     delete = "delete",
     update = "update",
     insert = "insert"
 }
 
-export function generateProjectCUDSql(
-    whitelist: string[],
-    viewName: string,
-    primaryKey: string,
-    data: unknown
-): [string, sqlType] {
+export function generateProjectCUDSql(whitelist: string[], api: ApiInterface, data: unknown): [string, sqlType] {
     // get keys in whitelist
     const keys = Object.keys(data).filter((v) => whitelist.indexOf(v) !== -1);
+    const primaryKey = api.primaryKey;
+    const viewName = api.viewName;
 
     // check if primary key is included, else its a insert
     // I have "x" prefix on primary, since I will use it in sql code, not allowed to start column with _ $ or #
@@ -31,7 +30,14 @@ export function generateProjectCUDSql(
              */
             case isDelete && !isUpdate && !isInsert && havePrimaryKey:
                 type = sqlType.delete;
-                sqlString = `delete from \n\t${viewName} \nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"}`;
+
+                if (api.project) {
+                    // prettier-ignore
+                    sqlString = `delete from \n\t${viewName} \nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"} and ${api.project} = :${api.project}`;
+                } else {
+                    sqlString = `delete from \n\t${viewName} \nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"}`;
+                }
+
                 break;
             /**
              * UPDATE
@@ -43,9 +49,13 @@ export function generateProjectCUDSql(
                 keys.forEach((key, i) => {
                     sqlString = sqlString + `${i > 0 ? "," : ""}\n\t${key} = :${key}`;
                 });
-
-                // if not project then its just primary key
-                sqlString = sqlString + `\nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"}\n`;
+                if (api.project) {
+                    // prettier-ignore
+                    sqlString = sqlString + `\nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"} and ${api.project} = :${api.project}\n`;
+                } else {
+                    // if not project then its just primary key
+                    sqlString = sqlString + `\nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"}\n`;
+                }
 
                 break;
             /**
@@ -54,7 +64,18 @@ export function generateProjectCUDSql(
             case isInsert && !isDelete && !isUpdate: // we dont need primary key for insert
                 type = sqlType.insert;
 
-                sqlString = `insert into ${viewName}(\n\t${keys.join(",\n\t")}) \nvalues(${keys
+                let keys_withOrWithoutProject = [];
+                if (api.project) {
+                    keys_withOrWithoutProject = keys.concat(api.project);
+                } else {
+                    keys_withOrWithoutProject.push(...keys);
+                }
+
+                // prettier-ignore
+                sqlString = `insert into ${viewName}(\n\t${
+                    keys_withOrWithoutProject
+                        .join(",\n\t")}) \nvalues(${
+                    keys_withOrWithoutProject
                     .map((v) => "\n\t:" + v)
                     .join(",")})\n`;
             // instead of update does not support returning, so need a workaround for it

@@ -1,21 +1,30 @@
 import { streamQuery } from "../utils/streamQuery";
 import { Response } from "express";
-import { log, logLine } from "@rad-common";
+import { ApiInterface, log, logLine } from "@rad-common";
 import { getSqlWhereString } from "../utils/getSqlWhereString";
 import { CONSOLE_INFO, CONSOLE_SELECT } from "../config";
 
 export async function standardProjectQuery(
     req: any,
     res: Response<any, Record<string, any>>,
-    viewName: string,
+    api: ApiInterface,
     queryOverride?: any
 ) {
-    const { meta, rows, count, format } = req.query;
+    const { meta, rows, count, format, project } = req.query;
+    const viewName = api.viewName;
 
     log(CONSOLE_INFO, `request meta:`, meta);
     log(CONSOLE_INFO, `request rows:`, rows);
     log(CONSOLE_INFO, `request count:`, count);
     log(CONSOLE_INFO, `request json:`, format);
+    log(CONSOLE_INFO, `request project:`, project);
+
+    if (api.project && !project) {
+        res.statusMessage = "missing project";
+        res.status(504).send();
+        res.end();
+        return;
+    }
 
     // helper for json format check
     function isJsonFormat(value) {
@@ -61,10 +70,14 @@ export async function standardProjectQuery(
 
     let sql = "";
     if (viewName) {
-        // todo clean up
-
-        const whereQuery = whereSql ? `where ${whereSql}` : "";
-        sql = `from ${viewName} ${whereQuery}`;
+        if (api.project === null) {
+            const whereQuery = whereSql ? `where ${whereSql}` : "";
+            sql = `from ${viewName} ${whereQuery}`;
+        } else {
+            const projectQuery = api.project === null ? "" : `where ${api.project} ? ':REQ_PROJECT_CODE'`;
+            sql = `from ${viewName} ${projectQuery} ${whereSql ? `and ${whereSql}` : ""} `;
+            sqlBindings.push(project);
+        }
 
         // not very beautiful, but a start
         switch (true) {
