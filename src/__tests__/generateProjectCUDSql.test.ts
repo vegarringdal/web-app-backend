@@ -14,8 +14,16 @@ function cleanSQl(sql) {
 describe("check generateRoleObject", () => {
     test("insert with project code", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY", project: "PROJECT_CODE" } as ApiInterface,
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                project: "PROJECT_CODE",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    }
+                ]
+            } as ApiInterface,
             { __$insert: true, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
@@ -27,8 +35,15 @@ describe("check generateRoleObject", () => {
 
     test("insert without project code", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    }
+                ]
+            } as ApiInterface,
             { __$insert: true, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
@@ -38,8 +53,18 @@ describe("check generateRoleObject", () => {
 
     test("insert without project code, multiple props", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME", "LAST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    },
+                    {
+                        name: "LAST_NAME"
+                    }
+                ]
+            } as ApiInterface,
             { __$insert: true, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
@@ -51,8 +76,16 @@ describe("check generateRoleObject", () => {
 
     test("update with project code", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY", project: "PROJECT_CODE" } as ApiInterface,
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                project: "PROJECT_CODE",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    }
+                ]
+            } as ApiInterface,
             { __$update: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
@@ -64,9 +97,21 @@ describe("check generateRoleObject", () => {
 
     test("update without project code", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
-            { __$update: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    }
+                ]
+            } as ApiInterface,
+            {
+                __$update: true,
+                PRIMARY_KEY_VAR: 1,
+                FIRST_NAME: "FIRST",
+                LAST_NAME: "LAST"
+            }
         );
 
         expect(type).toEqual("update");
@@ -77,8 +122,18 @@ describe("check generateRoleObject", () => {
 
     test("update without project code, multiple props", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME", "LAST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    },
+                    {
+                        name: "LAST_NAME"
+                    }
+                ]
+            } as ApiInterface,
             { __$update: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
@@ -90,8 +145,16 @@ describe("check generateRoleObject", () => {
 
     test("delete with project code", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY", project: "PROJECT_CODE" } as ApiInterface,
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                project: "PROJECT_CODE",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    }
+                ]
+            } as ApiInterface,
             { __$delete: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
@@ -103,8 +166,15 @@ describe("check generateRoleObject", () => {
 
     test("delete without project code", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    }
+                ]
+            } as ApiInterface,
             { __$delete: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
@@ -114,8 +184,15 @@ describe("check generateRoleObject", () => {
 
     test("delete missing PRIMARY_KEY_VAR will not generate sql", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    }
+                ]
+            } as ApiInterface,
             { __$delete: true, LAST_NAME: "LAST" }
         );
 
@@ -125,8 +202,15 @@ describe("check generateRoleObject", () => {
 
     test("update missing PRIMARY_KEY_VAR will not generate sql", () => {
         const [sqlString, type] = generateProjectCUDSql(
-            ["FIRST_NAME"],
-            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            {
+                viewName: "MY_TABLE",
+                primaryKey: "MY_PRIMARY_KEY",
+                columns: [
+                    {
+                        name: "FIRST_NAME"
+                    }
+                ]
+            } as ApiInterface,
             { __$update: true, LAST_NAME: "LAST" }
         );
 

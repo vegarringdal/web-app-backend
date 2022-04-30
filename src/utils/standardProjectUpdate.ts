@@ -25,6 +25,13 @@ export async function standardProjectUpdate(
         return;
     }
 
+    if (apiConfig.project) {
+        if (!roles.PROJECT_CODE) {
+            databaseHandler.error("missing project");
+            return;
+        }
+    }
+
     // sort so we get delete, update then inserts
     if (Array.isArray(data)) {
         data = data.sort((a, b) => {
