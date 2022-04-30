@@ -6,10 +6,13 @@ enum sqlType {
     insert = "insert"
 }
 
-export function generateProjectCUDSql(api: ApiInterface, data: unknown): [string, sqlType] {
+export function generateProjectCUDSql(
+    updateableColumns: string[],
+    api: ApiInterface,
+    data: unknown
+): [string, sqlType] {
     // get keys in whitelist
-    const whitelistedColumns = api.columns?.map((e) => e.name) || [];
-    const keys = Object.keys(data).filter((v) => whitelistedColumns.indexOf(v) !== -1);
+    const keys = Object.keys(data).filter((v) => updateableColumns.indexOf(v) !== -1);
     const primaryKey = api.primaryKey;
     const viewName = api.viewName;
 
