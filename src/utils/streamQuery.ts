@@ -93,7 +93,7 @@ export async function streamQuery(
 
             if (buffer.length > DB_FETCH_SIZE) {
                 if (skipStringify) {
-                    sendData(buffer, true);
+                    sendData(buffer, false);
                 } else {
                     sendData(JSON.stringify(buffer), false);
                 }
@@ -105,9 +105,9 @@ export async function streamQuery(
             log(CONSOLE_INFO, `Streaming, metadata event`);
             if (!usejson) {
                 if (skipStringify) {
-                    sendData(metadata, true);
+                    sendData([metadata], false);
                 } else {
-                    sendData(JSON.stringify(metadata), true);
+                    sendData(JSON.stringify([metadata]), false);
                 }
             }
         });
