@@ -9,7 +9,6 @@ const cache: any = {};
 
 export async function verifyToken(token) {
     try {
-        debugger;
         const decodedToken = jwt.decode(token, { complete: true });
 
         async function getKeys() {
