@@ -22,7 +22,8 @@ export async function streamQuery(
     tableNameOrReportName: string,
     usejson: boolean | null,
     sendData: (data: string | any[], done: boolean) => void,
-    metaOnly?: boolean
+    metaOnly?: boolean,
+    skipStringify?: boolean
 ): Promise<{ success: boolean; msg?: any }> {
     return new Promise(async (resolve, reject) => {
         let connection: OracleDB.Connection;
@@ -62,7 +63,11 @@ export async function streamQuery(
         stream?.on("close", function () {
             log(CONSOLE_INFO, `Streaming, close event, buffer lenght:${buffer.length}`);
             if (!error) {
-                sendData(JSON.stringify(buffer), true);
+                if (skipStringify) {
+                    sendData(buffer, true);
+                } else {
+                    sendData(JSON.stringify(buffer), true);
+                }
             }
             buffer = [];
             closeConnection();
@@ -87,8 +92,11 @@ export async function streamQuery(
             buffer.push(data);
 
             if (buffer.length > DB_FETCH_SIZE) {
-                sendData(JSON.stringify(buffer), false);
-
+                if (skipStringify) {
+                    sendData(buffer, true);
+                } else {
+                    sendData(JSON.stringify(buffer), false);
+                }
                 buffer = [];
             }
         });
@@ -96,7 +104,11 @@ export async function streamQuery(
         stream?.on("metadata", function (metadata: any) {
             log(CONSOLE_INFO, `Streaming, metadata event`);
             if (!usejson) {
-                sendData(JSON.stringify([metadata]), false);
+                if (skipStringify) {
+                    sendData(metadata, true);
+                } else {
+                    sendData(JSON.stringify(metadata), true);
+                }
             }
         });
     });
