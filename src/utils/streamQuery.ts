@@ -32,7 +32,7 @@ export async function streamQuery(
         let error = false;
         try {
             log(CONSOLE_INFO, `Streaming, getConnection`);
-            connection = await getDatabaseConnection(userID);
+            connection = await getDatabaseConnection(userID, "READ");
             log(CONSOLE_INFO, `Streaming, getConnection OK`);
         } catch (err) {
             log(CONSOLE_INFO, `Streaming, getConnection FAILED:`, err);

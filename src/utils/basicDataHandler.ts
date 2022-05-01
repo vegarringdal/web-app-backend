@@ -31,7 +31,7 @@ export class BasicDataHandler {
         if (this.skipConnection) {
             log(CONSOLE_INFO, "skipConnection activated, skipping getDbConnection");
         } else {
-            this.dbConnection = await getDatabaseConnection(this.clientID);
+            this.dbConnection = await getDatabaseConnection(this.clientID, "MODIFY");
         }
     }
 

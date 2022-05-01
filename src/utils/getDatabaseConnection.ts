@@ -6,7 +6,7 @@ import {
 } from "../config";
 import { pool } from "./initOracleDatabaseConnection";
 
-export async function getDatabaseConnection(clientId: string) {
+export async function getDatabaseConnection(clientId: string, action: "READ" | "MODIFY") {
     if (pool) {
         const connection = await pool.getConnection();
 
@@ -14,7 +14,7 @@ export async function getDatabaseConnection(clientId: string) {
         connection.clientId = clientId || DB_CONNECTION_CLIENT_ID;
         connection.clientInfo = DB_CONNECTION_CLIENT_INFO;
         connection.module = DB_CONNECTION_MODULE;
-        //connection.action = TODO: add MODIFICATION or SELECT
+        connection.action = action;
         connection.dbOp = DB_CONNECTION_DB_OP;
 
         return connection;
