@@ -1,101 +1,136 @@
-import { ApiInterface } from "../../../rad-common/src/utils/ApiInterface";
+import { ApiInterface } from "@rad-common";
+import { generateProjectCUDSql } from "../utils/generateProjectCUDSql";
 
-enum sqlType {
-    delete = "delete",
-    update = "update",
-    insert = "insert"
+function cleanSQl(sql) {
+    return sql
+        .replace(/\n/g, " ")
+        .replace(/\r/g, " ")
+        .replace(/\t/g, " ")
+        .replace(/  /g, " ")
+        .replace(/  /g, " ")
+        .trim();
 }
 
-export function generateProjectCUDSql(whitelist: string[], api: ApiInterface, data: unknown): [string, sqlType] {
-    // get keys in whitelist
-    const keys = Object.keys(data).filter((v) => whitelist.indexOf(v) !== -1);
-    const primaryKey = api.primaryKey;
-    const viewName = api.viewName;
+describe("check generateRoleObject", () => {
+    test("insert with project code", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY", project: "PROJECT_CODE" } as ApiInterface,
+            { __$insert: true, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+        );
 
-    // check if primary key is included, else its a insert
-    // I have "x" prefix on primary, since I will use it in sql code, not allowed to start column with _ $ or #
-    const havePrimaryKey = Object.keys(data).includes("PRIMARY_KEY_VAR");
-    const isDelete = Object.keys(data).includes("__$delete");
-    const isUpdate = Object.keys(data).includes("__$update");
-    const isInsert = Object.keys(data).includes("__$insert");
-
-    let sqlString = "";
-    let type = null;
-    if (keys.length === 0 && !isDelete) {
-        sqlString = "";
-    } else {
-        switch (true) {
-            /**
-             * DELETE
-             */
-            case isDelete && !isUpdate && !isInsert && havePrimaryKey:
-                type = sqlType.delete;
-
-                if (api.project) {
-                    // prettier-ignore
-                    sqlString = `delete from \n\t${viewName} \nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"} and ${api.project} = :${api.project}`;
-                } else {
-                    sqlString = `delete from \n\t${viewName} \nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"}`;
-                }
-
-                break;
-            /**
-             * UPDATE
-             */
-            case isUpdate && !isDelete && !isInsert && havePrimaryKey:
-                type = sqlType.update;
-                sqlString = `update \n\t${viewName} \nset`;
-
-                keys.forEach((key, i) => {
-                    sqlString = sqlString + `${i > 0 ? "," : ""}\n\t${key} = :${key}`;
-                });
-                if (api.project) {
-                    // prettier-ignore
-                    sqlString = sqlString + `\nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"} and ${api.project} = :${api.project}\n`;
-                } else {
-                    // if not project then its just primary key
-                    sqlString = sqlString + `\nwhere \n\t${primaryKey} = :${"PRIMARY_KEY_VAR"}\n`;
-                }
-
-                break;
-            /**
-             * INSERT
-             */
-            case isInsert && !isDelete && !isUpdate: // we dont need primary key for insert
-                type = sqlType.insert;
-
-                let keys_withOrWithoutProject = [];
-                if (api.project) {
-                    keys_withOrWithoutProject = keys.concat(api.project);
-                } else {
-                    keys_withOrWithoutProject.push(...keys);
-                }
-
-                // prettier-ignore
-                sqlString = `insert into ${viewName}(\n\t${
-                    keys_withOrWithoutProject
-                        .join(",\n\t")}) \nvalues(${
-                    keys_withOrWithoutProject
-                    .map((v) => "\n\t:" + v)
-                    .join(",")})\n`;
-            // instead of update does not support returning, so need a workaround for it
-        }
-    }
-
-    // convert iso date string js date, so orcle undestands it
-    keys.forEach((key) => {
-        // "2021-04-03T15:40:39.180Z"
-        if (
-            // chance of this beeing anything but date is very unlikely..
-            typeof data[key] === "string" &&
-            data[key][10] === "T" &&
-            data[key][13] === ":" &&
-            data[key][23] === "Z" &&
-            data[key].length === 24
-        ) {
-            data[key] = new Date(data[key]);
-        }
+        expect(type).toEqual("insert");
+        expect(cleanSQl(sqlString)).toEqual(
+            "insert into MY_TABLE( FIRST_NAME, PROJECT_CODE) values( :FIRST_NAME, :PROJECT_CODE)"
+        );
     });
 
-    return [sqlString, type];
-}
+    test("insert without project code", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            { __$insert: true, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+        );
+
+        expect(type).toEqual("insert");
+        expect(cleanSQl(sqlString)).toEqual("insert into MY_TABLE( FIRST_NAME) values( :FIRST_NAME)");
+    });
+
+    test("insert without project code, multiple props", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME", "LAST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            { __$insert: true, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+        );
+
+        expect(type).toEqual("insert");
+        expect(cleanSQl(sqlString)).toEqual(
+            "insert into MY_TABLE( FIRST_NAME, LAST_NAME) values( :FIRST_NAME, :LAST_NAME)"
+        );
+    });
+
+    test("update with project code", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY", project: "PROJECT_CODE" } as ApiInterface,
+            { __$update: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+        );
+
+        expect(type).toEqual("update");
+        expect(cleanSQl(sqlString)).toEqual(
+            "update MY_TABLE set FIRST_NAME = :FIRST_NAME where MY_PRIMARY_KEY = :PRIMARY_KEY_VAR and PROJECT_CODE = :PROJECT_CODE"
+        );
+    });
+
+    test("update without project code", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            { __$update: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+        );
+
+        expect(type).toEqual("update");
+        expect(cleanSQl(sqlString)).toEqual(
+            "update MY_TABLE set FIRST_NAME = :FIRST_NAME where MY_PRIMARY_KEY = :PRIMARY_KEY_VAR"
+        );
+    });
+
+    test("update without project code, multiple props", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME", "LAST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            { __$update: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+        );
+
+        expect(type).toEqual("update");
+        expect(cleanSQl(sqlString)).toEqual(
+            "update MY_TABLE set FIRST_NAME = :FIRST_NAME, LAST_NAME = :LAST_NAME where MY_PRIMARY_KEY = :PRIMARY_KEY_VAR"
+        );
+    });
+
+    test("delete with project code", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY", project: "PROJECT_CODE" } as ApiInterface,
+            { __$delete: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+        );
+
+        expect(type).toEqual("delete");
+        expect(cleanSQl(sqlString)).toEqual(
+            "delete from MY_TABLE where MY_PRIMARY_KEY = :PRIMARY_KEY_VAR and PROJECT_CODE = :PROJECT_CODE"
+        );
+    });
+
+    test("delete without project code", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            { __$delete: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+        );
+
+        expect(type).toEqual("delete");
+        expect(cleanSQl(sqlString)).toEqual("delete from MY_TABLE where MY_PRIMARY_KEY = :PRIMARY_KEY_VAR");
+    });
+
+    test("delete missing PRIMARY_KEY_VAR will not generate sql", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            { __$delete: true, LAST_NAME: "LAST" }
+        );
+
+        expect(type).toEqual(null);
+        expect(cleanSQl(sqlString)).toEqual("");
+    });
+
+    test("update missing PRIMARY_KEY_VAR will not generate sql", () => {
+        const [sqlString, type] = generateProjectCUDSql(
+            ["FIRST_NAME"],
+            { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
+            { __$update: true, LAST_NAME: "LAST" }
+        );
+
+        expect(type).toEqual(null);
+        expect(cleanSQl(sqlString)).toEqual("");
+    });
+});
