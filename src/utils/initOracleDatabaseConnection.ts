@@ -15,7 +15,7 @@ import { DB_FETCH_SIZE, DB_PREFETCH_SIZE } from "../config";
 OracleDB.outFormat = OracleDB.OUT_FORMAT_ARRAY; // use less memory server side and client side by using the array, espesially client side
 OracleDB.fetchArraySize = DB_FETCH_SIZE; // keep low to keep server memory load low
 OracleDB.prefetchRows = DB_PREFETCH_SIZE; // keep low to keep server memory load low
-process.env.ORA_SDTZ = 'UTC';
+process.env.ORA_SDTZ = "UTC";
 // do not fetch date as string, will only create issues when we loose timestamp/zone
 OracleDB.fetchAsString = [OracleDB.NUMBER, OracleDB.CLOB]; // stringfy will break these anyway, and number will be wrong if we dont do this
 OracleDB.extendedMetaData = true;
