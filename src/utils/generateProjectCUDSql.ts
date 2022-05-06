@@ -16,12 +16,16 @@ export function generateProjectCUDSql(
     const primaryKey = api.primaryKey;
     const viewName = api.viewName;
 
-    // check if primary key is included, else its a insert
-    // I have "x" prefix on primary, since I will use it in sql code, not allowed to start column with _ $ or #
-    const havePrimaryKey = Object.keys(data).includes("PRIMARY_KEY_VAR");
     const isDelete = Object.keys(data).includes("__$delete");
     const isUpdate = Object.keys(data).includes("__$update");
     const isInsert = Object.keys(data).includes("__$insert");
+    const havePrimaryKey = Object.keys(data).includes("__$primarykey");
+    if (havePrimaryKey) {
+        // check if primary key is included, else its a insert
+        // I need to rewrite primary since, since I will use it in sql code, not allowed to start column with _ $ or #
+        (data as any).PRIMARY_KEY_VAR = (data as any).__$primarykey;
+        delete (data as any).__$primarykey;
+    }
 
     let sqlString = "";
     let type = null;

@@ -53,7 +53,7 @@ describe("check generateRoleObject", () => {
         const [sqlString, type] = generateProjectCUDSql(
             ["FIRST_NAME"],
             { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY", project: "PROJECT_CODE" } as ApiInterface,
-            { __$update: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+            { __$update: true, __$primarykey: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
         expect(type).toEqual("update");
@@ -66,7 +66,7 @@ describe("check generateRoleObject", () => {
         const [sqlString, type] = generateProjectCUDSql(
             ["FIRST_NAME"],
             { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
-            { __$update: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+            { __$update: true, __$primarykey: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
         expect(type).toEqual("update");
@@ -79,7 +79,7 @@ describe("check generateRoleObject", () => {
         const [sqlString, type] = generateProjectCUDSql(
             ["FIRST_NAME", "LAST_NAME"],
             { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
-            { __$update: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+            { __$update: true, __$primarykey: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
         expect(type).toEqual("update");
@@ -92,7 +92,7 @@ describe("check generateRoleObject", () => {
         const [sqlString, type] = generateProjectCUDSql(
             ["FIRST_NAME"],
             { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY", project: "PROJECT_CODE" } as ApiInterface,
-            { __$delete: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+            { __$delete: true, __$primarykey: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
         expect(type).toEqual("delete");
@@ -105,7 +105,7 @@ describe("check generateRoleObject", () => {
         const [sqlString, type] = generateProjectCUDSql(
             ["FIRST_NAME"],
             { viewName: "MY_TABLE", primaryKey: "MY_PRIMARY_KEY" } as ApiInterface,
-            { __$delete: true, PRIMARY_KEY_VAR: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
+            { __$delete: true, __$primarykey: 1, FIRST_NAME: "FIRST", LAST_NAME: "LAST" }
         );
 
         expect(type).toEqual("delete");
