@@ -10,12 +10,46 @@ async function start() {
     await initOracleDatabaseConnection();
 
     // todo check access layer works, lets just add a fetch here for now
+    // check should check all columns I expect
     try {
         await streamQuery(
             `select username from AI_WEB_USER fetch first 1 rows only`,
             [],
             "na",
             "AI_WEB_USER",
+            true,
+            (data) => {
+                logStartup("ORACLE ACCESS DB TEST: ", data);
+            }
+        );
+
+        await streamQuery(
+            `select name from AI_WEB_ROLE fetch first 1 rows only`,
+            [],
+            "na",
+            "AI_WEB_ROLE",
+            true,
+            (data) => {
+                logStartup("ORACLE ACCESS DB TEST: ", data);
+            }
+        );
+
+        await streamQuery(
+            `select name, username from AI_WEB_USER_ROLE fetch first 1 rows only`,
+            [],
+            "na",
+            "AI_WEB_USER_ROLE",
+            true,
+            (data) => {
+                logStartup("ORACLE ACCESS DB TEST: ", data);
+            }
+        );
+
+        await streamQuery(
+            `select name, enabled from AI_WEB_REST_API fetch first 1 rows only`,
+            [],
+            "na",
+            "AI_WEB_REST_API",
             true,
             (data) => {
                 logStartup("ORACLE ACCESS DB TEST: ", data);
