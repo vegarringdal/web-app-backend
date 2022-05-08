@@ -1,13 +1,13 @@
 import { log, logStartup } from "@rad-common";
 import { standardProjectQuery } from "./standardProjectQuery";
 import { CONSOLE_INFO } from "../config";
-import { getRoles } from "./getSqlAccess";
 import { protectedRoute } from "./protectedRoute";
 import express from "express";
 import { standardProjectUpdate } from "./standardProjectUpdate";
 import { BasicDataHandler } from "./basicDataHandler";
 import { generateRoleObject } from "./generateRoleObject";
 import { ApiInterface } from "@rad-common";
+import { getApi } from "./getSqlApi";
 
 export type User = {
     name: string;
@@ -55,6 +55,7 @@ function initiateDefaultConfig(app: express.Application) {
     {
         /**
          * Gets info about paths registed
+         * TODO: show dynamic api also
          */
         const API_INFO = `/api/all`;
         logStartup("API added:", API_INFO);
@@ -92,7 +93,11 @@ function initiateDefaultConfig(app: express.Application) {
             log(CONSOLE_INFO, "calling api:", API_INFO, req.path);
 
             const name = req.path.replace(API_INFO.replace("*", ""), "");
-            const api = API[name];
+            let api = API[name];
+            if (!api) {
+                // check dynamic api
+                api = await getApi(name);
+            }
 
             if (!api) {
                 const statusMessage = "unknown API";
@@ -131,7 +136,12 @@ function initiateDefaultConfig(app: express.Application) {
             log(CONSOLE_INFO, "calling api:", API_QUERY);
 
             const name = req.path.replace(API_QUERY.replace("*", ""), "");
-            const api = API[name];
+            let api = API[name];
+
+            if (!api) {
+                // check dynamic api
+                api = await getApi(name);
+            }
 
             if (!api) {
                 const statusMessage = "unknown API";
@@ -156,7 +166,12 @@ function initiateDefaultConfig(app: express.Application) {
             log(CONSOLE_INFO, "calling api:", API_UPDATE);
 
             const name = req.path.replace(API_UPDATE.replace("*", ""), "");
-            const api = API[name];
+            let api = API[name];
+
+            if (!api) {
+                // check dynamic api
+                api = await getApi(name);
+            }
 
             if (!api) {
                 const statusMessage = "unknown API";
@@ -200,7 +215,6 @@ function initiateDefaultConfig(app: express.Application) {
 export function generateApi(app: express.Application, api: ApiInterface) {
     // add to api
     // this is why name also needs to be unique
-    // I want to be able to update late, so maybe add version ?
     API[api.apiName] = api;
 
     if (!initiatedDefaultApi) {
