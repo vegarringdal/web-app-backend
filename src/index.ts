@@ -4,7 +4,7 @@ import { logError, logLine, logStartup } from "@rad-common";
 import { streamQuery } from "./utils/streamQuery";
 import { generateApi } from "./utils/generateApi";
 import { readApiConfig } from "./utils/readApiConfig";
-import { getApiConfigs } from "@rad-common";
+import { getApiConfigs } from "@rad-api";
 
 async function start() {
     await initOracleDatabaseConnection();

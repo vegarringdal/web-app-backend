@@ -5,12 +5,17 @@ import path from "path";
 export const makeAllPackagesExternalPlugin = {
     name: "make-all-packages-external",
     setup(build) {
-        const filter = /^[^.\/]|^\.[^.\/]|^\.\.[^\/]|^@rad-common/; // Must not start with "/" or "./" or "../"
+        const filter = /^[^.\/]|^\.[^.\/]|^\.\.[^\/]|^@rad-common|^@rad-api/; // Must not start with "/" or "./" or "../"
         build.onResolve({ filter }, (args: any) => {
             switch (args.path) {
                 case "@rad-common":
                     return {
                         path: path.resolve(__dirname, "../rad-common/src/index.ts"),
+                        external: false
+                    };
+                case "@rad-api":
+                    return {
+                        path: path.resolve(__dirname, "../rad-common/src/default_api_config/getDefaultConfig.ts"),
                         external: false
                     };
                 default:
