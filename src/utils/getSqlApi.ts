@@ -37,8 +37,7 @@ export async function updateApi(apiName: string) {
             if (Array.isArray(data)) {
                 data.forEach((e) => {
                     try {
-                        const apiData = JSON.stringify(e[0].DATA);
-                        debugger;
+                        const apiData = JSON.parse(e.DATA);
                         const [apiInterface, apiInterfaceError, errors] = verifyApiConfig(apiData as any);
                         if (errors === 0) {
                             api = apiInterface;
