@@ -2,8 +2,11 @@ import { streamQuery } from "../utils/streamQuery";
 
 type roleset = string[];
 
-// TODO: I might want some expire on this..
 const sqlUserRoles = new Map<string, roleset>();
+
+setInterval(() => {
+    sqlUserRoles.clear();
+}, 1000 * 60 * 15); // clear cache every 15 min
 
 export async function getRoles(username: string) {
     if (sqlUserRoles.has(username)) {
