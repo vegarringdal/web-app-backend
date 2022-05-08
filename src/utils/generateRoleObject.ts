@@ -9,7 +9,9 @@ export function generateRoleObject(
         return typeof x === "object" && !Array.isArray(x) && x !== null;
     }
 
-    const PROJECT_CODE = project_code || "";
+    // if project is hard coded, we need to override it
+    // project set here will be used in update
+    const PROJECT_CODE = config?.projectHardCoded ? config.projectHardCoded : project_code || "";
 
     if (!config || !isObject(config) || !userRoles || !Array.isArray(userRoles)) {
         return {

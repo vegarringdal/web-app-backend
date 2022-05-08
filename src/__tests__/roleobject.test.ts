@@ -119,5 +119,23 @@ describe("check generateRoleObject", () => {
         });
     });
 
+    test("replace out [PROJECT_CODE] with project code and override project ", () => {
+        const config = {
+            projectHardCoded: "002200",
+            accessDelete: ["ADMIN"],
+            accessInsert: ["ADMIN_[PROJECT_CODE]"],
+            accessUpdate: ["ADMIN"]
+        };
+
+        const object = generateRoleObject(config as any, ["ADMIN_002200"], "007900");
+        expect(object).toEqual({
+            PROJECT_CODE: "002200",
+            DELETE: false,
+            INSERT: true,
+            UPDATE: false,
+            UPDATABLE_COLUMNS: []
+        });
+    });
+
     // TODO: add more test with columns, so I get to test update access better
 });

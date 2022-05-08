@@ -107,7 +107,7 @@ function initiateDefaultConfig(app: express.Application) {
                 return;
             }
 
-            const project_code = req.query.project as string;
+            const project_code = api.projectHardCoded ? api.projectHardCoded : (req.query.project as string);
             const user = req.user as User;
             const userName = user?.name;
             const userID = user?.id;
