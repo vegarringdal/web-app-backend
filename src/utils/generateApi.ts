@@ -41,12 +41,10 @@ function initiateDefaultConfig(app: express.Application) {
             const user = req.user as User;
             const userName = user?.name;
             const userID = user?.id;
-            const userAzureRoles = user?.roles;
-            const sqlProjectRoles = await getRoles(userID);
+            const userRoles = user?.roles;
 
             res.status(200).send({
-                azureRoles: userAzureRoles,
-                allUserRoles: userAzureRoles.concat(sqlProjectRoles),
+                allUserRoles: userRoles,
                 user: { userName, userID }
             });
             res.end();
@@ -72,13 +70,11 @@ function initiateDefaultConfig(app: express.Application) {
             const user = req.user as User;
             const userName = user?.name;
             const userID = user?.id;
-            const userAzureRoles = user?.roles;
-            const sqlProjectRoles = await getRoles(userID);
+            const userRoles = user?.roles;
 
             res.status(200).send({
                 paths,
-                azureRoles: userAzureRoles,
-                allUserRoles: userAzureRoles.concat(sqlProjectRoles),
+                allUserRoles: userRoles,
                 user: { userName, userID }
             });
             res.end();
@@ -110,15 +106,14 @@ function initiateDefaultConfig(app: express.Application) {
             const user = req.user as User;
             const userName = user?.name;
             const userID = user?.id;
-            const userAzureRoles = user?.roles;
-            const sqlProjectRoles = await getRoles(userID);
+            const userRoles = user?.roles;
 
-            const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles), project_code);
+            const apiRoles = generateRoleObject(api, userRoles, project_code);
 
             res.status(200).send({
                 api: api,
-                apiRoles: userroles,
-                allUserRoles: userAzureRoles.concat(sqlProjectRoles),
+                apiRoles: apiRoles,
+                allUserRoles: userRoles,
                 user: { userName, userID }
             });
             res.end();
@@ -173,11 +168,10 @@ function initiateDefaultConfig(app: express.Application) {
 
             const user = req.user as User;
             const userID = user?.id;
-            const userAzureRoles = user?.roles;
-            const sqlProjectRoles = await getRoles(userID);
+            const userRoles = user?.roles;
             const project_code = req.query.project as string;
 
-            const userroles = generateRoleObject(api, userAzureRoles.concat(sqlProjectRoles), project_code);
+            const userroles = generateRoleObject(api, userRoles, project_code);
 
             // todo: not very userfriendly, todo, add format JSON...
             res.setHeader("Content-Type", "text/html"); // this should have been plain -> but I need ot figure out how ngninx override in our AKS

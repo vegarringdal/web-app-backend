@@ -6,7 +6,7 @@
 import { CONSOLE_INFO } from "../config";
 import { log } from "@rad-common";
 import { verifyToken } from "./verifyToken";
-import { getRolesFromUser } from "./getRolesFromUser";
+import { getRoles } from "./getSqlAccess";
 
 export async function protectedRoute(req: any, res: any, next: any) {
     let error = false;
@@ -19,8 +19,7 @@ export async function protectedRoute(req: any, res: any, next: any) {
             roles: tokenVerified.roles
         };
 
-        const result = await getRolesFromUser(tokenVerified.upn);
-        const roles = result?.map((e) => e.NAME);
+        const roles = await getRoles(tokenVerified.upn);
         if (Array.isArray(roles)) {
             req.user.roles = req.user.roles.concat(roles);
         }

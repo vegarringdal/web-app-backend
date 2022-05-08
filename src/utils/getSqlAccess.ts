@@ -33,13 +33,15 @@ export async function updateSqlAccess(username: string) {
             if (Array.isArray(data)) {
                 data.forEach((e) => {
                     if (Array.isArray(e)) {
-                        roles.push(e[0]);
+                        roles.push(e[0].NAME);
                     } else {
-                        roles.push(e);
+                        roles.push(e?.NAME);
                     }
                 });
             }
-        }
+        },
+        false,
+        true
     );
     sqlUserRoles.set(username, roles);
 }
