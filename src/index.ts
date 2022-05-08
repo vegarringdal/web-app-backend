@@ -9,11 +9,12 @@ import { getApiConfigs } from "@rad-common";
 async function start() {
     await initOracleDatabaseConnection();
 
-    // todo check access layer works, lets just add a fetch here for now
-    // check should check all columns I expect
     try {
+        // add check for default tables on database connectoin supplied
+        // without these we kill server
+        // TODO, add grid config table check, not important for POC
         await streamQuery(
-            `select username from AI_WEB_USER fetch first 1 rows only`,
+            `select ID,FIRSTNAME,LASTNAME,USERNAME,CREATED,CREATED_BY,MODIFIED,MODIFIED_BY from AI_WEB_USER fetch first 1 rows only`,
             [],
             "na",
             "AI_WEB_USER",
@@ -24,7 +25,7 @@ async function start() {
         );
 
         await streamQuery(
-            `select name from AI_WEB_ROLE fetch first 1 rows only`,
+            `select ID,NAME,DESCRIPTION,CREATED,CREATED_BY,MODIFIED,MODIFIED_BY from AI_WEB_ROLE fetch first 1 rows only`,
             [],
             "na",
             "AI_WEB_ROLE",
@@ -35,7 +36,7 @@ async function start() {
         );
 
         await streamQuery(
-            `select name, username from AI_WEB_USER_ROLE fetch first 1 rows only`,
+            `select ID, WEB_ROLE_ID, WEB_USER_ID,NAME,USERNAME,CREATED,CREATED_BY,MODIFIED,MODIFIED_BY from AI_WEB_USER_ROLE fetch first 1 rows only`,
             [],
             "na",
             "AI_WEB_USER_ROLE",
@@ -46,7 +47,7 @@ async function start() {
         );
 
         await streamQuery(
-            `select name, enabled from AI_WEB_REST_API fetch first 1 rows only`,
+            `select ID,NAME,DATA,ENABLED,CREATED,CREATED_BY,MODIFIED,MODIFIED_BY from AI_WEB_REST_API fetch first 1 rows only`,
             [],
             "na",
             "AI_WEB_REST_API",
