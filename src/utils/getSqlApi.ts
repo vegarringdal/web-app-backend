@@ -15,7 +15,10 @@ export async function getApi(apiName: string) {
     } else {
         await updateApi(apiName);
         if (apiCache.has(apiName)) {
-            return apiCache.get(apiName) || null;
+            // clear all the time in the beginning, not sure if I want cache..
+            const x = apiCache.get(apiName) || null;
+            apiCache.clear();
+            return x;
         } else {
             return null;
         }
@@ -35,7 +38,7 @@ export async function updateApi(apiName: string) {
                 data.forEach((e) => {
                     try {
                         const apiData = JSON.stringify(e[0].DATA);
-                        debugger
+                        debugger;
                         const [apiInterface, apiInterfaceError, errors] = verifyApiConfig(apiData as any);
                         if (errors === 0) {
                             api = apiInterface;
