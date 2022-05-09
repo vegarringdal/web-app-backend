@@ -40,7 +40,7 @@ clearFolders("dist");
  */
 nodejs(
     {
-        watch: ["./src/**/*.ts", "../rad-common/**/*.ts"],
+        watch: ["./src/**/*.ts", "../rad-common/**/*.ts", "../rad-frontend/src/api/**/*.ts"],
         launch: true,
         launchArg: { argsBefore: ["--inspect"] } //--inspect-brk to force debugging, PS!you need to start debugger
     },
