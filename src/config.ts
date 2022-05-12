@@ -46,7 +46,7 @@ try {
 }
 
 // if you change this you also need to edit config for vitejs
-export const WEB_ROOT: string = path.join(__dirname, "../../application", "dist");
+export const WEB_ROOT: string = path.join(__dirname, "../../rad-frontend", "dist");
 export const IS_DEVELOPMENT: boolean = devMode; // esbuild gives us this one
 
 /**

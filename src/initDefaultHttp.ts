@@ -17,7 +17,16 @@ export async function initHttpConfig() {
      * Protect your app from some well-known web vulnerabilities by setting HTTP headers appropriately.
      */
     if (!IS_DEVELOPMENT) {
-        app.use(helmet());
+        app.use(
+            // https://helmetjs.github.io/
+            helmet.contentSecurityPolicy({
+                directives: {
+                    "default-src": ["'self'"],
+                    "connect-src": ["'self'", "https://login.microsoftonline.com"],
+                    "style-src": ["'self'", "https: 'unsafe-inline'"]
+                }
+            })
+        );
     }
 
     // allow large updates
