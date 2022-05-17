@@ -198,7 +198,7 @@ function initiateDefaultConfig(app: express.Application) {
                 api,
                 new BasicDataHandler(res, api, userID),
                 (count: number) => {
-                    res.write(`${count}`);
+                    res.write(`${count};`);
                 }
             );
 
