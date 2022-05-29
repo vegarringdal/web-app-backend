@@ -2,6 +2,7 @@
 import type { FilterArgument } from "@simple-html/datasource";
 // quickfix, not sure why I could not use @rad-common
 import { NumberFormater } from "../../../rad-common/src/index";
+import { validateColumnName } from "./validateColumnName";
 
 /**
  *
@@ -14,6 +15,9 @@ export function getSqlWhereString(filter: FilterArgument) {
 
     // helper for setting sql binding
     function getBinding(value: any) {
+        if (typeof value === "string" && value.includes("*")) {
+            value = value.replaceAll("*", "%");
+        }
         sqlBindings.push(value);
         bindCount++;
         return `:${bindCount}`;
@@ -29,16 +33,6 @@ export function getSqlWhereString(filter: FilterArgument) {
     let isDate = false;
     let isNumber = false;
     let isDateTime = false;
-
-    // helper funtion to limit what characters allowed in columns names to prevent sql injection
-    const validateColumnName = function (value: string) {
-        if (!/^[A-Za-z_]+$/.test(value)) {
-            //check value
-            throw "illiegal characters in column name, only allowed [A-Za-z_]";
-        } else {
-            return value;
-        }
-    };
 
     const operatorCheck = function (obj: FilterArgument) {
         const operator = obj.operator;
