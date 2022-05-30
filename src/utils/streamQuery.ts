@@ -62,7 +62,7 @@ export async function streamQuery(
 
         stream?.on("close", function () {
             log(CONSOLE_INFO, `Streaming, close event, buffer lenght:${buffer.length}`);
-            if (!error) {
+            if (!error && buffer.length) {
                 if (skipStringify) {
                     sendData(buffer, true);
                 } else {

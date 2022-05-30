@@ -20,10 +20,12 @@ async function start() {
             [],
             "na",
             "AI_WEB_USER",
-            true,
+            false, // we want meta, normal json does not send meta
             (data) => {
-                logStartup("ORACLE ACCESS DB TEST: ", data);
-            }
+                logStartup("ORACLE ACCESS AI_WEB_USER TEST: ", data.length);
+            },
+            true, // only need meta data for test
+            true
         );
 
         at = "AI_WEB_ROLE";
@@ -32,10 +34,12 @@ async function start() {
             [],
             "na",
             "AI_WEB_ROLE",
-            true,
+            false, // we want meta, normal json does not send meta
             (data) => {
-                logStartup("ORACLE ACCESS DB TEST: ", data);
-            }
+                logStartup("ORACLE ACCESS AI_WEB_ROLE TEST: ", data.length);
+            },
+            true, // only need meta data for test
+            true
         );
         at = "AI_WEB_USER_ROLE";
         await streamQuery(
@@ -43,10 +47,12 @@ async function start() {
             [],
             "na",
             "AI_WEB_USER_ROLE",
-            true,
+            false, // we want meta, normal json does not send meta
             (data) => {
-                logStartup("ORACLE ACCESS DB TEST: ", data);
-            }
+                logStartup("ORACLE ACCESS AI_WEB_USER_ROLE TEST: ", data.length);
+            },
+            true, // only need meta data for test
+            true
         );
 
         at = "AI_WEB_REST_API";
@@ -55,10 +61,12 @@ async function start() {
             [],
             "na",
             "AI_WEB_REST_API",
-            true,
+            false, // we want meta, normal json does not send meta
             (data) => {
-                logStartup("ORACLE ACCESS DB TEST: ", data);
-            }
+                logStartup("ORACLE API AI_WEB_REST_API TEST: ", data.length);
+            },
+            true, // only need meta data for test
+            true
         );
     } catch (e) {
         logError("ORACLE ACCESS DB ERROR: default tables need to have be added", at);
